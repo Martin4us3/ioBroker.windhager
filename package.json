@@ -1,12 +1,12 @@
 {
   "name": "iobroker.windhager",
-  "version": "0.9.9",
+  "version": "0.10.0",
   "description": "Adapter for Windhager API",
   "author": {
-    "name": "Roman Brunka",
-    "email": "rbrunka@gmail.com"
+    "name": "Martin Danne",
+    "email": "martin.danne@4us3.de"
   },
-  "homepage": "https://github.com/rbrunka/ioBroker.windhager",
+  "homepage": "https://github.com/Martin4us3/ioBroker.windhager",
   "license": "MIT",
   "keywords": [
     "ioBroker",
@@ -16,10 +16,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/rbrunka/ioBroker.windhager"
+    "url": "https://github.com/Martin4us3/ioBroker.windhager"
   },
   "dependencies": {
     "@iobroker/adapter-core": "^1.0.3",
+    "axios-digest": "^0.3.0",
     "urllib": "^2.37.0"
   },
   "devDependencies": {
@@ -51,7 +52,7 @@
     "lint": "eslint"
   },
   "bugs": {
-    "url": "https://github.com/rbrunka/ioBroker.windhager/issues"
+    "url": "https://github.com/Martin4us3/ioBroker.windhager/issues"
   },
   "readmeFilename": "README.md"
 }

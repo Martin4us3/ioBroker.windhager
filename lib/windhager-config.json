@@ -1,0 +1,1269 @@
+{
+  "type": {
+    "0": "number",
+    "1": "number",
+    "2": "number",
+    "3": "number",
+    "4": "string",
+    "9": "number",
+    "13": "number",
+    "15": "number",
+    "16": "number",
+    "29": "string",
+    "30": "string"
+  },
+  "unit": {
+    "0": "",
+    "1": "°C",
+    "2": "K",
+    "4": "%",
+    "5": "h",
+    "6": "min",
+    "7": "s",
+    "8": "kW",
+    "10": "U/min",
+    "11": "Pa",
+    "20": "",
+    "21": "",
+    "45": "kg",
+    "46": "t",
+    "-1": ""
+  },
+  "function_type": {
+    "9": {
+      "level": {
+        "097": {
+          "name": "Unbekannte Ebene"
+        },
+        "098": {
+          "name": "Unbekannte Ebene"
+        },
+        "099": {
+          "name": "Unbekannte Ebene"
+        },
+        "100": {
+          "name": "Unbekannte Ebene"
+        },
+        "101": {
+          "name": "Unbekannte Ebene"
+        },
+        "102": {
+          "name": "Unbekannte Ebene"
+        },
+        "103": {
+          "name": "Unbekannte Ebene"
+        },
+        "104": {
+          "name": "Unbekannte Ebene"
+        },
+        "105": {
+          "name": "Unbekannte Ebene"
+        },
+        "106": {
+          "name": "Unbekannte Ebene"
+        }
+      },
+      "state": {
+        "00-007": {
+          "name": "Kesseltemperatur Istwert",
+          "level": "100",
+          "lookup": 1
+        },
+        "00-009": {
+          "name": "Aktuelle Kesselleistung",
+          "level": "098"
+        },
+        "00-011": {
+          "name": "Temperatur Abgas",
+          "level": "098"
+        },
+        "00-045": {
+          "name": "Brennkammertemperatur",
+          "level": "100"
+        },
+        "01-007": {
+          "name": "Solltemperatur",
+          "level": "098"
+        },
+        "02-000": {
+          "name": "Alarmcode",
+          "level": "097"
+        },
+        "02-001": {
+          "name": "Betriebsphasen",
+          "level": "100",
+          "enum": "Betriebsphasen",
+          "lookup": 1
+        },
+        "02-059": {
+          "name": "Betriebsarten",
+          "level": "097",
+          "enum": "Betriebsarten"
+        },
+        "02-072": {
+          "name": "Uhrzeit",
+          "level": "103",
+          "lookup": 1
+        },
+        "02-080": {
+          "name": "Anzahl der Brennerstarts",
+          "level": "098"
+        },
+        "02-081": {
+          "name": "Betriebsstunden",
+          "level": "098"
+        },
+        "04-001": {
+          "name": "Unbekannter Parameter",
+          "level": "103"
+        },
+        "04-005": {
+          "name": "Funktionsbezeichnung",
+          "level": "103"
+        },
+        "04-092": {
+          "name": "Softwareversion Feuerungsautomat",
+          "level": "098"
+        },
+        "04-093": {
+          "name": "Version HW",
+          "level": "098"
+        },
+        "09-020": {
+          "name": "Handbetrieb Solltemperatur",
+          "level": "104"
+        },
+        "09-021": {
+          "name": "Hysterese Brenner EIN",
+          "level": "100"
+        },
+        "09-057": {
+          "name": "Solltemperatur ext. Wärmeanforderung",
+          "level": "100"
+        },
+        "09-075": {
+          "name": "Betriebswahl",
+          "level": "097",
+          "enum": "Betriebswahl",
+          "lookup": 1
+        },
+        "09-090": {
+          "name": "Kaminkehrerbetrieb Restlaufzeit",
+          "level": "097"
+        },
+        "10-110": {
+          "name": "Kaminkehrerbetrieb Leistung",
+          "level": "097"
+        },
+        "11-027": {
+          "name": "WEZ-Nummer",
+          "level": "100"
+        },
+        "12-038": {
+          "name": "Kesseltype",
+          "level": "098"
+        },
+        "12-039": {
+          "name": "Maximalwert der Solltemperatur",
+          "level": "100"
+        },
+        "12-041": {
+          "name": "Unbekannter Parameter",
+          "level": "103"
+        },
+        "12-100": {
+          "name": "Brennstoffmenge Förderschnecke Bereich",
+          "level": "100"
+        },
+        "12-101": {
+          "name": "Brennstoffmenge Förderschnecke Istwert",
+          "level": "100"
+        },
+        "12-104": {
+          "name": "Brennstoffmenge Förderschnecke Korrektur",
+          "level": "100"
+        },
+        "14-010": {
+          "name": "Zuführung mit Freigabezeit Ende",
+          "level": "099"
+        },
+        "14-011": {
+          "name": "Zuführung mit Freigabezeit Beginn",
+          "level": "099"
+        },
+        "14-019": {
+          "name": "Betriebsart Zuführung",
+          "level": "099"
+        },
+        "14-020": {
+          "name": "Zuführung mit Startzeit Startzeit",
+          "level": "099"
+        },
+        "14-075": {
+          "name": "Korrektur Reinigungsintervall",
+          "level": "099"
+        },
+        "14-079": {
+          "name": "Heizflächenreinigung Beginn Sperrzeit",
+          "level": "099"
+        },
+        "14-080": {
+          "name": "Heizflächenreinigung Dauer",
+          "level": "099"
+        },
+        "20-061": {
+          "name": "Laufzeit bis Reinigung",
+          "level": "098"
+        },
+        "20-062": {
+          "name": "Laufzeit bis Hauptreinigung",
+          "level": "098"
+        },
+        "20-090": {
+          "name": "Unbekannter Parameter",
+          "level": "103"
+        },
+        "20-091": {
+          "name": "Unbekannter Parameter",
+          "level": "103"
+        },
+        "20-092": {
+          "name": "Unbekannter Parameter",
+          "level": "103"
+        },
+        "20-093": {
+          "name": "Unbekannter Parameter",
+          "level": "103"
+        },
+        "20-094": {
+          "name": "Unbekannter Parameter",
+          "level": "103"
+        },
+        "20-095": {
+          "name": "Unbekannter Parameter",
+          "level": "103"
+        },
+        "20-096": {
+          "name": "Unbekannter Parameter",
+          "level": "104"
+        },
+        "20-097": {
+          "name": "Unbekannter Parameter",
+          "level": "104"
+        },
+        "20-098": {
+          "name": "Unbekannter Parameter",
+          "level": "104"
+        },
+        "20-099": {
+          "name": "Unbekannter Parameter",
+          "level": "104"
+        },
+        "20-106": {
+          "name": "Unbekannter Parameter",
+          "level": "104"
+        },
+        "20-108": {
+          "name": "Unbekannter Parameter",
+          "level": "097"
+        },
+        "20-116": {
+          "name": "Unbekannter Parameter",
+          "level": "097"
+        },
+        "23-100": {
+          "name": "Pelletverbrauch",
+          "level": "097"
+        },
+        "23-103": {
+          "name": "Gesamt Pelletverbrauch",
+          "level": "097"
+        },
+        "37-000": {
+          "name": "Unbekannter Parameter",
+          "level": "104"
+        },
+        "37-001": {
+          "name": "Unbekannter Parameter",
+          "level": "105"
+        },
+        "37-002": {
+          "name": "Unbekannter Parameter",
+          "level": "105"
+        },
+        "37-003": {
+          "name": "Unbekannter Parameter",
+          "level": "104"
+        },
+        "37-004": {
+          "name": "Unbekannter Parameter",
+          "level": "104"
+        },
+        "37-005": {
+          "name": "Unbekannter Parameter",
+          "level": "104"
+        },
+        "37-047": {
+          "name": "Unbekannter Parameter",
+          "level": "105"
+        },
+        "37-108": {
+          "name": "Unbekannter Parameter",
+          "level": "105"
+        },
+        "37-120": {
+          "name": "Unbekannter Parameter",
+          "level": "105"
+        },
+        "37-121": {
+          "name": "Unbekannter Parameter",
+          "level": "105"
+        },
+        "37-122": {
+          "name": "Unbekannter Parameter",
+          "level": "105"
+        },
+        "37-123": {
+          "name": "Unbekannter Parameter",
+          "level": "105"
+        },
+        "37-126": {
+          "name": "Unbekannter Parameter",
+          "level": "105"
+        },
+        "37-127": {
+          "name": "Unbekannter Parameter",
+          "level": "105"
+        },
+        "39-014": {
+          "name": "Unbekannter Parameter",
+          "level": "101"
+        },
+        "39-017": {
+          "name": "Unbekannter Parameter",
+          "level": "101"
+        },
+        "39-023": {
+          "name": "Unbekannter Parameter",
+          "level": "101"
+        },
+        "39-032": {
+          "name": "Unbekannter Parameter",
+          "level": "101"
+        },
+        "39-081": {
+          "name": "Unbekannter Parameter",
+          "level": "101"
+        },
+        "39-094": {
+          "name": "Unbekannter Parameter",
+          "level": "099"
+        },
+        "39-095": {
+          "name": "Unbekannter Parameter",
+          "level": "099"
+        },
+        "39-117": {
+          "name": "Unbekannter Parameter",
+          "level": "106"
+        },
+        "39-120": {
+          "name": "Unbekannter Parameter",
+          "level": "106"
+        },
+        "39-121": {
+          "name": "Unbekannter Parameter",
+          "level": "106"
+        },
+        "39-122": {
+          "name": "Unbekannter Parameter",
+          "level": "106"
+        },
+        "39-123": {
+          "name": "Unbekannter Parameter",
+          "level": "106"
+        },
+        "41-004": {
+          "name": "Unbekannter Parameter",
+          "level": "106"
+        },
+        "41-005": {
+          "name": "Unbekannter Parameter",
+          "level": "106"
+        },
+        "41-006": {
+          "name": "Unbekannter Parameter",
+          "level": "106"
+        },
+        "41-007": {
+          "name": "Unbekannter Parameter",
+          "level": "106"
+        },
+        "41-088": {
+          "name": "Unbekannter Parameter",
+          "level": "106"
+        },
+        "43-001": {
+          "name": "Unbekannter Parameter",
+          "level": "101"
+        },
+        "43-004": {
+          "name": "Unbekannter Parameter",
+          "level": "101"
+        },
+        "43-019": {
+          "name": "Unbekannter Parameter",
+          "level": "101"
+        },
+        "43-034": {
+          "name": "Unbekannter Parameter",
+          "level": "099"
+        },
+        "43-047": {
+          "name": "Unbekannter Parameter",
+          "level": "102"
+        },
+        "43-048": {
+          "name": "Unbekannter Parameter",
+          "level": "102"
+        },
+        "43-049": {
+          "name": "Unbekannter Parameter",
+          "level": "102"
+        },
+        "43-050": {
+          "name": "Unbekannter Parameter",
+          "level": "102"
+        },
+        "43-051": {
+          "name": "Unbekannter Parameter",
+          "level": "102"
+        }
+      },
+      "enum": {
+        "Betriebsarten": {
+          "0": "Ausgeschaltet",
+          "5": "Ein"
+        },
+        "Betriebswahl": {
+          "0": "AUS",
+          "1": "EIN",
+          "2": "Handbetrieb",
+          "3": "Kaminkehrerbetrieb",
+          "4": "Aktorentest",
+          "5": "",
+          "6": "",
+          "7": "",
+          "8": ""
+        },
+        "Betriebsphasen": {
+          "0": "",
+          "1": "",
+          "2": "",
+          "3": "Standby",
+          "4": "",
+          "5": "",
+          "6": "",
+          "7": "",
+          "8": "",
+          "9": "",
+          "10": "",
+          "11": "",
+          "12": "",
+          "13": "",
+          "14": "",
+          "15": ""
+        }
+      }
+    },
+    "14": {
+      "level": {
+        "096": {
+          "name": "Betriebswahl"
+        },
+        "097": {
+          "name": "Behaglichkeit"
+        },
+        "098": {
+          "name": "WW-Ladefreigabe"
+        },
+        "099": {
+          "name": "Eco / Party"
+        },
+        "100": {
+          "name": "Ferienprogramm"
+        },
+        "101": {
+          "name": "Raumtemperatur-Sollwerte"
+        },
+        "102": {
+          "name": "Uhrzeit / Datum"
+        },
+        "103": {
+          "name": "Modulfunktionen"
+        },
+        "104": {
+          "name": "Auslegungstemperaturen"
+        },
+        "105": {
+          "name": "Raumtemperatureinfluss"
+        },
+        "106": {
+          "name": "Heizgrenzen"
+        },
+        "107": {
+          "name": "Warmwasserladung"
+        },
+        "108": {
+          "name": "Kesseltemp-Überhöhung"
+        },
+        "109": {
+          "name": "Startoptimierung"
+        },
+        "110": {
+          "name": "LON-Systemdaten"
+        },
+        "111": {
+          "name": "Estrichausheizprogramm"
+        },
+        "112": {
+          "name": "Modulinfo"
+        },
+        "113": {
+          "name": "Raumtemperatur"
+        },
+        "114": {
+          "name": "Warmwassertemperatur"
+        },
+        "115": {
+          "name": "Aussentemperatur"
+        },
+        "116": {
+          "name": "Vorlauftemperatur"
+        },
+        "117": {
+          "name": "Kesseltemperatur"
+        },
+        "122": {
+          "name": "Unbekannte Ebene"
+        },
+        "126": {
+          "name": "Unbekannte Ebene"
+        }
+      },
+      "state": {
+        "00-000": {
+          "name": "Aussentemperatur",
+          "level": "115",
+          "maxValue": "50"
+        },
+        "00-002": {
+          "name": "Aktueller Wert",
+          "level": "116",
+          "lname": "Vorlauftemperatur Aktueller Wert"
+        },
+        "00-004": {
+          "name": "Aktueller Wert",
+          "level": "114",
+          "lname": "Warmwassertemperatur Aktueller Wert",
+          "lookup": 1
+        },
+        "00-007": {
+          "name": "Kesseltemperatur Istwert",
+          "level": "117",
+          "lname": "Kesseltemperatur Kesseltemperatur Istwert",
+          "lookup": 1
+        },
+        "01-001": {
+          "name": "Sollwert",
+          "level": "113",
+          "lname": "Raumtemperatur Sollwert",
+          "maxValue": "50"
+        },
+        "01-002": {
+          "name": "Sollwert",
+          "level": "116",
+          "lname": "Vorlauftemperatur Sollwert",
+          "maxValue": "50"
+        },
+        "01-004": {
+          "name": "Sollwert",
+          "level": "114",
+          "lname": "Warmwassertemperatur Sollwert"
+        },
+        "01-007": {
+          "name": "Solltemperatur",
+          "level": "117",
+          "lname": "Kesseltemperatur Solltemperatur"
+        },
+        "01-020": {
+          "name": "Heizkreispumpe",
+          "level": "122"
+        },
+        "01-021": {
+          "name": "Mischer",
+          "level": "122"
+        },
+        "01-066": {
+          "name": "Warmwasser Ladepumpe",
+          "level": "122"
+        },
+        "02-010": {
+          "name": "Dauer",
+          "level": "099",
+          "lname": "Eco / Party Dauer"
+        },
+        "02-016": {
+          "name": "Freigabe starten",
+          "level": "098",
+          "lname": "WW-Ladefreigabe Freigabe starten"
+        },
+        "02-070": {
+          "name": "Datum",
+          "level": "102"
+        },
+        "02-072": {
+          "name": "Uhrzeit",
+          "level": "102",
+          "lookup": 1
+        },
+        "03-001": {
+          "name": "Fusspunkt",
+          "level": "104",
+          "lname": "Auslegungstemperaturen Fusspunkt"
+        },
+        "03-002": {
+          "name": "TA Absenkbetrieb",
+          "level": "106",
+          "lname": "Heizgrenzen TA Absenkbetrieb"
+        },
+        "03-004": {
+          "name": "Temperatur",
+          "level": "099",
+          "lname": "Eco / Party Temperatur"
+        },
+        "03-006": {
+          "name": "Vorhaltezeit",
+          "level": "109",
+          "lname": "Startoptimierung Vorhaltezeit"
+        },
+        "03-007": {
+          "name": "Kompensation",
+          "level": "105",
+          "lname": "Raumtemperatureinfluss Kompensation"
+        },
+        "03-012": {
+          "name": "Klimapunkt",
+          "level": "104",
+          "lname": "Auslegungstemperaturen Klimapunkt"
+        },
+        "03-013": {
+          "name": "Vorlauf",
+          "level": "104",
+          "lname": "Auslegungstemperaturen Vorlauf"
+        },
+        "03-021": {
+          "name": "TA Heizbetrieb",
+          "level": "106",
+          "lname": "Heizgrenzen TA Heizbetrieb"
+        },
+        "03-029": {
+          "name": "Rücklauf",
+          "level": "104",
+          "lname": "Auslegungstemperaturen Rücklauf"
+        },
+        "03-030": {
+          "name": "Nachstellzeit",
+          "level": "105",
+          "lname": "Raumtemperatureinfluss Nachstellzeit"
+        },
+        "03-050": {
+          "name": "Betriebswahl",
+          "level": "096",
+          "enum": "Betriebswahl",
+          "lookup": 1
+        },
+        "03-051": {
+          "name": "Heizbetrieb",
+          "level": "101",
+          "lname": "Raumtemperatur-Sollwerte Heizbetrieb"
+        },
+        "03-053": {
+          "name": "Absenkbetrieb",
+          "level": "101",
+          "lname": "Raumtemperatur-Sollwerte Absenkbetrieb"
+        },
+        "03-058": {
+          "name": "Korrekturwert",
+          "level": "097",
+          "lname": "Behaglichkeit Korrekturwert"
+        },
+        "03-078": {
+          "name": "bis Datum",
+          "level": "100",
+          "lname": "Ferienprogramm bis Datum"
+        },
+        "04-005": {
+          "name": "Funktionsbezeichnung",
+          "level": "112",
+          "lname": "Modulinfo Funktionsbezeichnung"
+        },
+        "04-012": {
+          "name": "Systemzeit",
+          "level": "110",
+          "lname": "LON-Systemdaten Systemzeit"
+        },
+        "04-013": {
+          "name": "Aussentemp.",
+          "level": "110",
+          "lname": "LON-Systemdaten Aussentemp."
+        },
+        "04-014": {
+          "name": "Betriebswahl",
+          "level": "110",
+          "lname": "LON-Systemdaten Betriebswahl"
+        },
+        "04-060": {
+          "name": "Programm",
+          "level": "111",
+          "lname": "Estrichausheizprogramm Programm"
+        },
+        "04-063": {
+          "name": "T-Beharrung",
+          "level": "111",
+          "lname": "Estrichausheizprogramm T-Beharrung"
+        },
+        "04-064": {
+          "name": "Dauer Beharrung",
+          "level": "111",
+          "lname": "Estrichausheizprogramm Dauer Beharrung"
+        },
+        "04-065": {
+          "name": "T-Aufheizphase",
+          "level": "111",
+          "lname": "Estrichausheizprogramm T-Aufheizphase"
+        },
+        "04-066": {
+          "name": "T-Abkühlphase",
+          "level": "111",
+          "lname": "Estrichausheizprogramm T-Abkühlphase"
+        },
+        "04-067": {
+          "name": "Dauer T-Änderung",
+          "level": "111",
+          "lname": "Estrichausheizprogramm Dauer T-Änderung"
+        },
+        "04-092": {
+          "name": "Softwareversion Feuerungsautomat",
+          "level": "112",
+          "lname": "Modulinfo Softwareversion Feuerungsautomat"
+        },
+        "04-093": {
+          "name": "Version HW",
+          "level": "112",
+          "lname": "Modulinfo Version HW"
+        },
+        "05-006": {
+          "name": "Zirkulationspumpe",
+          "level": "126"
+        },
+        "05-008": {
+          "name": "max. Ladevorrang",
+          "level": "107",
+          "lname": "Warmwasserladung max. Ladevorrang"
+        },
+        "05-051": {
+          "name": "Temperatur",
+          "level": "098",
+          "lname": "WW-Ladefreigabe Temperatur"
+        },
+        "05-076": {
+          "name": "WW-Kreis",
+          "level": "103",
+          "lname": "Modulfunktionen WW-Kreis"
+        },
+        "07-001": {
+          "name": "Heizkreis",
+          "level": "108",
+          "lname": "Kesseltemp-Überhöhung Heizkreis"
+        },
+        "07-002": {
+          "name": "Vorlauf min.",
+          "level": "106",
+          "lname": "Heizgrenzen Vorlauf min."
+        },
+        "07-008": {
+          "name": "Vorlauf max.",
+          "level": "106",
+          "lname": "Heizgrenzen Vorlauf max."
+        },
+        "07-076": {
+          "name": "Heizkreis",
+          "level": "103",
+          "lname": "Modulfunktionen Heizkreis"
+        },
+        "20-127": {
+          "name": "Unbekannter Parameter",
+          "level": "112",
+          "lname": "Modulinfo Unbekannter Parameter"
+        }
+      },
+      "enum": {
+        "Betriebswahl": {
+          "0": "Standby",
+          "1": "Heizprogramm 1",
+          "2": "Heizprogramm 2",
+          "3": "Heizprogramm 3",
+          "4": "Heizbetrieb",
+          "5": "Absenkbetrieb",
+          "6": "Warmwasserbetrieb",
+          "7": ""
+        }
+      }
+    },
+    "15": {
+      "level": {
+        "096": {
+          "name": "Betriebswahl"
+        },
+        "097": {
+          "name": "Anlagekonfiguration"
+        },
+        "098": {
+          "name": "Modulfunktionen"
+        },
+        "099": {
+          "name": "Puffertemperatur"
+        },
+        "100": {
+          "name": "Kesseltemperatur"
+        },
+        "101": {
+          "name": "Umschaltventil"
+        },
+        "102": {
+          "name": "Schichtladung"
+        },
+        "103": {
+          "name": "Fühleranschluss Y3"
+        },
+        "104": {
+          "name": "Puffertemperatur"
+        },
+        "105": {
+          "name": "Kesseltemperatur"
+        },
+        "108": {
+          "name": "Modulinfo"
+        },
+        "109": {
+          "name": "Unbekannte Ebene"
+        },
+        "113": {
+          "name": "Unbekannte Ebene"
+        },
+        "114": {
+          "name": "Unbekannte Ebene"
+        },
+        "115": {
+          "name": "Unbekannte Ebene"
+        }
+      },
+      "state": {
+        "00-007": {
+          "name": "Kesseltemperatur Istwert",
+          "level": "105",
+          "lname": "Kesseltemperatur Kesseltemperatur Istwert"
+        },
+        "00-008": {
+          "name": "Rücklauftemperatur Wärmeerzeuger",
+          "level": "114"
+        },
+        "00-017": {
+          "name": "Puffertemperatur Mitte",
+          "level": "104",
+          "lname": "Puffertemperatur Puffertemperatur Mitte"
+        },
+        "01-007": {
+          "name": "Solltemperatur",
+          "level": "105",
+          "lname": "Kesseltemperatur Solltemperatur"
+        },
+        "01-008": {
+          "name": "Rücklauftemp. Sollwert Wärmeerzeuger",
+          "level": "114"
+        },
+        "01-102": {
+          "name": "Mischer Kesselschutz",
+          "level": "109"
+        },
+        "04-005": {
+          "name": "Funktionsbezeichnung",
+          "level": "108",
+          "lname": "Modulinfo Funktionsbezeichnung"
+        },
+        "04-092": {
+          "name": "Softwareversion Feuerungsautomat",
+          "level": "108",
+          "lname": "Modulinfo Softwareversion Feuerungsautomat"
+        },
+        "04-093": {
+          "name": "Version HW",
+          "level": "108",
+          "lname": "Modulinfo Version HW"
+        },
+        "07-012": {
+          "name": "Drehzahlregelung",
+          "level": "102",
+          "lname": "Schichtladung Drehzahlregelung"
+        },
+        "07-020": {
+          "name": "Unbekannter Parameter",
+          "level": "113"
+        },
+        "09-032": {
+          "name": "Kessel- Minimaltemperatur",
+          "level": "100",
+          "lname": "Kesseltemperatur Kessel- Minimaltemperatur"
+        },
+        "10-031": {
+          "name": "Maximalwert",
+          "level": "100",
+          "lname": "Kesseltemperatur Maximalwert"
+        },
+        "20-000": {
+          "name": "Automatikkessel",
+          "level": "097",
+          "lname": "Anlagekonfiguration Automatikkessel"
+        },
+        "20-001": {
+          "name": "Festbrennstoff",
+          "level": "097",
+          "lname": "Anlagekonfiguration Festbrennstoff"
+        },
+        "20-002": {
+          "name": "Pufferspeicher",
+          "level": "097",
+          "lname": "Anlagekonfiguration Pufferspeicher"
+        },
+        "20-003": {
+          "name": "Modulfunktionen",
+          "level": "098"
+        },
+        "20-005": {
+          "name": "Fühleranschluss Y3",
+          "level": "103"
+        },
+        "20-006": {
+          "name": "Antrieb",
+          "level": "101",
+          "lname": "Umschaltventil Antrieb"
+        },
+        "20-007": {
+          "name": "Umschaltsperrzeit",
+          "level": "101",
+          "lname": "Umschaltventil Umschaltsperrzeit"
+        },
+        "20-008": {
+          "name": "Funktion aktivieren",
+          "level": "102",
+          "lname": "Schichtladung Funktion aktivieren"
+        },
+        "20-009": {
+          "name": "Zeitverzögerung",
+          "level": "102",
+          "lname": "Schichtladung Zeitverzögerung"
+        },
+        "20-010": {
+          "name": "Minimalwert",
+          "level": "099",
+          "lname": "Puffertemperatur Minimalwert"
+        },
+        "20-011": {
+          "name": "Offset WE-Sollwert",
+          "level": "099",
+          "lname": "Puffertemperatur Offset WE-Sollwert"
+        },
+        "20-014": {
+          "name": "min. Drehzahl",
+          "level": "102",
+          "lname": "Schichtladung min. Drehzahl"
+        },
+        "20-015": {
+          "name": "Betriebswahl",
+          "level": "096"
+        },
+        "20-016": {
+          "name": "Maximalwert",
+          "level": "099",
+          "lname": "Puffertemperatur Maximalwert"
+        },
+        "20-017": {
+          "name": "Sollwert",
+          "level": "102",
+          "lname": "Schichtladung Sollwert"
+        },
+        "20-022": {
+          "name": "max. Drehzahl",
+          "level": "102",
+          "lname": "Schichtladung max. Drehzahl"
+        },
+        "20-124": {
+          "name": "Unbekannter Parameter",
+          "level": "115"
+        },
+        "20-125": {
+          "name": "Unbekannter Parameter",
+          "level": "113"
+        },
+        "20-126": {
+          "name": "Unbekannter Parameter",
+          "level": "113"
+        },
+        "20-127": {
+          "name": "Unbekannter Parameter",
+          "level": "108",
+          "lname": "Modulinfo Unbekannter Parameter"
+        },
+        "22-050": {
+          "name": "PLP Pufferladepumpe",
+          "level": "109"
+        },
+        "22-075": {
+          "name": "Unbekannt",
+          "level": "109"
+        },
+        "22-076": {
+          "name": "Unbekannt",
+          "level": "109"
+        },
+        "23-087": {
+          "name": "Puffer-Beladegrad",
+          "level": "104",
+          "lname": "Puffertemperatur Puffer-Beladegrad"
+        }
+      },
+      "enum": {
+        "Betriebswahl": {
+          "0": "Standby",
+          "1": "Automatikbetrieb",
+          "2": "Festbrennstoffbetrieb",
+          "4": "Auto mit Zeitprogramm",
+          "6": "",
+          "7": ""
+        }
+      }
+    },
+    "16": {
+      "level": {
+        "096": {
+          "name": "Betriebswahl"
+        },
+        "097": {
+          "name": "Modulfunktionen"
+        },
+        "098": {
+          "name": "Kessel- Puffertemperatur"
+        },
+        "099": {
+          "name": "Brennersteuerung"
+        },
+        "100": {
+          "name": "Pufferladepumpe"
+        },
+        "101": {
+          "name": "Ext. Wärmeanforderung"
+        },
+        "102": {
+          "name": "Modulinfo"
+        },
+        "103": {
+          "name": "Kesseltemperatur"
+        },
+        "104": {
+          "name": "Puffertemperaturen"
+        },
+        "107": {
+          "name": "Unbekannte Ebene"
+        },
+        "113": {
+          "name": "Unbekannte Ebene"
+        },
+        "114": {
+          "name": "Unbekannte Ebene"
+        },
+        "115": {
+          "name": "Unbekannte Ebene"
+        },
+        "116": {
+          "name": "Unbekannte Ebene"
+        },
+        "117": {
+          "name": "Unbekannte Ebene"
+        }
+      },
+      "state": {
+        "00-008": {
+          "name": "Rücklauftemperatur Wärmeerzeuger",
+          "level": "114"
+        },
+        "01-007": {
+          "name": "Solltemperatur",
+          "level": "103",
+          "lname": "Kesseltemperatur Solltemperatur"
+        },
+        "01-008": {
+          "name": "Rücklauftemp. Sollwert Wärmeerzeuger",
+          "level": "114"
+        },
+        "01-015": {
+          "name": "Sollwert",
+          "level": "104",
+          "lname": "Puffertemperaturen Sollwert"
+        },
+        "01-022": {
+          "name": "Pumpe Wärmeerzeuger",
+          "level": "107"
+        },
+        "01-100": {
+          "name": "Brenner Stufe",
+          "level": "107"
+        },
+        "01-102": {
+          "name": "Mischer Kesselschutz",
+          "level": "107"
+        },
+        "02-070": {
+          "name": "Datum",
+          "level": "116"
+        },
+        "02-072": {
+          "name": "Uhrzeit",
+          "level": "116"
+        },
+        "04-005": {
+          "name": "Funktionsbezeichnung",
+          "level": "102",
+          "lname": "Modulinfo Funktionsbezeichnung"
+        },
+        "04-012": {
+          "name": "Systemzeit",
+          "level": "117"
+        },
+        "04-092": {
+          "name": "Softwareversion Feuerungsautomat",
+          "level": "102",
+          "lname": "Modulinfo Softwareversion Feuerungsautomat"
+        },
+        "04-093": {
+          "name": "Version HW",
+          "level": "102",
+          "lname": "Modulinfo Version HW"
+        },
+        "06-004": {
+          "name": "Überhöhung",
+          "level": "098",
+          "lname": "Kessel- Puffertemperatur Überhöhung"
+        },
+        "07-012": {
+          "name": "Drehzahlregelung",
+          "level": "100",
+          "lname": "Pufferladepumpe Drehzahlregelung"
+        },
+        "07-020": {
+          "name": "Unbekannter Parameter",
+          "level": "113"
+        },
+        "09-032": {
+          "name": "Kessel- Minimaltemperatur",
+          "level": "098",
+          "lname": "Kessel- Puffertemperatur Kessel- Minimaltemperatur"
+        },
+        "09-035": {
+          "name": "Hysterese",
+          "level": "099",
+          "lname": "Brennersteuerung Hysterese"
+        },
+        "09-057": {
+          "name": "Solltemperatur ext. Wärmeanforderung",
+          "level": "101",
+          "lname": "Ext. Wärmeanforderung Solltemperatur ext. Wärmeanforderung"
+        },
+        "10-031": {
+          "name": "Maximalwert",
+          "level": "098",
+          "lname": "Kessel- Puffertemperatur Maximalwert"
+        },
+        "20-004": {
+          "name": "Modulfunktionen",
+          "level": "097"
+        },
+        "20-014": {
+          "name": "min. Drehzahl",
+          "level": "100",
+          "lname": "Pufferladepumpe min. Drehzahl"
+        },
+        "20-015": {
+          "name": "Betriebswahl",
+          "level": "096"
+        },
+        "20-022": {
+          "name": "max. Drehzahl",
+          "level": "100",
+          "lname": "Pufferladepumpe max. Drehzahl"
+        },
+        "20-028": {
+          "name": "Unbekannter Parameter",
+          "level": "098",
+          "lname": "Kessel- Puffertemperatur Unbekannter Parameter"
+        },
+        "20-029": {
+          "name": "Unbekannter Parameter",
+          "level": "098",
+          "lname": "Kessel- Puffertemperatur Unbekannter Parameter"
+        },
+        "20-124": {
+          "name": "Unbekannter Parameter",
+          "level": "115"
+        },
+        "20-125": {
+          "name": "Unbekannter Parameter",
+          "level": "113"
+        },
+        "20-126": {
+          "name": "Unbekannter Parameter",
+          "level": "113"
+        },
+        "20-127": {
+          "name": "Unbekannter Parameter",
+          "level": "102",
+          "lname": "Modulinfo Unbekannter Parameter"
+        },
+        "21-065": {
+          "name": "TPE",
+          "level": "104",
+          "lname": "Puffertemperaturen TPE"
+        },
+        "21-066": {
+          "name": "TPA",
+          "level": "104",
+          "lname": "Puffertemperaturen TPA"
+        },
+        "22-075": {
+          "name": "Unbekannter Parameter",
+          "level": "107"
+        }
+      },
+      "enum": {
+        "Betriebswahl": {
+          "0": "Standby",
+          "1": "Automatikbetrieb",
+          "2": "Festbrennstoffbetrieb",
+          "4": "Auto mit Zeitprogramm",
+          "6": "",
+          "7": ""
+        }
+      }
+    }
+  }
+}

@@ -1,8 +1,11 @@
 {
     "common": {
-        "name": "iobroker.windhager",
-        "version": "0.9.9",
+        "name": "windhager",
+        "version": "0.10.0",
         "news": {
+            "0.10.0": {
+                "en": "revised to load and modify selected states"
+            },
             "0.9.9": {
                 "en": "change: request ==> urllib"
             },
@@ -61,7 +64,8 @@
             "zh-cn": "Windhager锅炉适配器"
         },
         "authors": [
-            "Roman Brunka <rbrunka@gmail.com>"
+            "Roman Brunka <rbrunka@gmail.com>",
+            "Martin Danne <martin.danne@4us3.de>"
         ],
         "keywords": [
             "ioBroker",
@@ -77,8 +81,7 @@
         "extIcon": "https://raw.githubusercontent.com/rbrunka/ioBroker.windhager/master/admin/windhager.png",
         "readme": "https://github.com/Author/ioBroker.windhager/blob/master/README.md",
         "loglevel": "info",
-        "mode": "schedule",
-        "schedule": "* * * * *",
+        "mode": "daemon",
         "type": "climate-control",
         "compact": true,
         "materialize": true,

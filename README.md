@@ -17,8 +17,12 @@
 4. Change to CUSTOM tab.
 5. Enter https://github.com/rbrunka/ioBroker.windhager.git into URL or file path and click INSTALL.
 
-
 ## Changelog
+
+### 0.10.0
+* (Martin4us3) revised to load and modify selected states
+
+### forked from rbrunka/ioBroker.windhager.bak
 
 ### 0.9.5
 * (rbrunka) added storing all received JSON data as one JSON data point
