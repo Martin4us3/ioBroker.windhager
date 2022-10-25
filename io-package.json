@@ -115,6 +115,38 @@
         "login": "Service",
         "password": "my-password"
     },
-    "objects": [],
-    "instanceObjects": []
+    "objects": [
+        {
+            "_id": "_design/windhager",
+            "language": "javascript",
+            "common": {
+                "name": {
+                    "en": "Windhager selectors",
+                    "de": "Windhager-Selektoren"
+                }
+            },
+            "views": {
+                "subnetObjects": {
+                    "map": "function(doc) { if (doc.type === 'state' || doc.type === 'channel' || doc.type === 'device' || doc.type === 'folder' ) emit(doc._id, doc) }"
+                },
+                "subnetStates": {
+                    "map": "function(doc) { if (doc.type === 'state') emit(doc._id, doc) }"
+                }
+            }
+        }
+    ],
+    "instanceObjects": [
+        {
+            "_id": "trigger_update",
+            "type": "state",
+            "common": {
+                "name": "Manually trigger an update",
+                "type": "boolean",
+                "role": "button",
+                "read": false,
+                "write": true
+            },
+            "native": {}
+        }
+    ]
 }
