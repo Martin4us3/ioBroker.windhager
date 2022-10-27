@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "windhager",
-        "version": "0.10.0",
+        "version": "0.11.0",
         "news": {
             "0.10.0": {
                 "en": "revised to load and modify selected states"
@@ -38,7 +38,7 @@
                 "zh-cn": "首次出版"
             }
         },
-        "title": "iobroker windhager adapter",
+        "title": "Windhager",
         "titleLang": {
             "en": "iobroker windhager adapter",
             "de": "iobroker windhager adapter",
@@ -78,8 +78,8 @@
         "main": "main.js",
         "icon": "windhager.png",
         "enabled": true,
-        "extIcon": "https://raw.githubusercontent.com/rbrunka/ioBroker.windhager/master/admin/windhager.png",
-        "readme": "https://github.com/Author/ioBroker.windhager/blob/master/README.md",
+        "extIcon": "https://raw.githubusercontent.com/Martin4us3/ioBroker.windhager/master/admin/windhager.png",
+        "readme": "https://github.com/Martin4us3/ioBroker.windhager/blob/master/README.md",
         "loglevel": "info",
         "mode": "daemon",
         "type": "climate-control",
@@ -113,7 +113,8 @@
     "native": {
         "ip": "192.168.178.21",
         "login": "Service",
-        "password": "my-password"
+        "password": "my-password",
+        "updateInterval": 60
     },
     "objects": [
         {
@@ -133,6 +134,19 @@
                     "map": "function(doc) { if (doc.type === 'state') emit(doc._id, doc) }"
                 }
             }
+        },
+        {
+            "_id": "windhager.admin.windhager-config",
+            "type": "state",
+            "common": {
+                "name": "windhager-config",
+                "desc": "Windhager configuration info",
+                "type": "json",
+                "role": "config",
+                "read": "true",
+                "write": "true"
+            },
+            "native": {}
         }
     ],
     "instanceObjects": [

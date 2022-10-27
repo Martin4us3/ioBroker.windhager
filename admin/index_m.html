@@ -16,6 +16,9 @@
     <link rel="stylesheet" type="text/css" href="style.css" />
     <script type="text/javascript" src="words.js"></script>
 
+    <link href="jsoneditor/dist/jsoneditor.min.css" rel="stylesheet" type="text/css">
+    <script src="jsoneditor/dist/jsoneditor.min.js"></script>
+
     <script type="text/javascript">
         // This will be called by the admin adapter when the settings page loads
         function load(settings, onChange) {
@@ -61,76 +64,67 @@
 
 <body>
     <div class="m adapter-container">
-        <div class="row">
-            <div class="col s12">
-                <div class="col s12 m12 l12 card horizontal">
-                    <div class="card-image">
-                        <img class="logo" src="windhager.png">
-                    </div>
-                    <div class="card-stacked">
-                        <div class="card-content">
-                            <div>
-                                <div class="my-card-title">Windhager</div>
-                                <div class="my-card-subTitle translate">Adapter for Windhager BioWIN2 Touch</div>
-                            </div>
+        <div class="col">
+            <div class="row s12 m12 l12 card horizontal">
+                <div class="card-image">
+                    <img class="logo" src="windhager.png">
+                </div>
+                <div class="card-stacked">
+                    <div class="card-content">
+                        <div>
+                            <div class="my-card-title">Windhager</div>
+                            <div class="my-card-subTitle translate">Adapter for Windhager BioWIN2 Touch</div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="col s12 m12 l12 card">
-                    <div class="card-content">
-                        <span class="card-title translate">Connection</span>
-                        <div class="col m6">
-                            <div class="input-field row">
-                                <input class="value" id="ip" type="text">
-                                <label for="ip">IP</label>
-                                <span class="translate">IP address of Windhager BioWIN2 Touch</span>
-                            </div>
+            <div class="row s12 m12 l12 card">
+                <div class="card-content">
+                    <span class="card-title translate">Connection</span>
+                    <div class="col m6">
+                        <div class="input-field row">
+                            <input class="value" id="ip" type="text">
+                            <label for="ip">IP</label>
+                            <span class="translate">IP address of Windhager BioWIN2 Touch</span>
                         </div>
-                        <div class="col m6">
-                            <div class="input-field row m6">
-                                <input type="text" class="value" id="login"/>
-                                <label for="login" class="translate">Login</label>
-                                <span class="translate">Default login is Service</span>
-                            </div>
-                            <div class="input-field row m6">
-                                <input id="password" type="text" class="value">
-                                <label for="password" data-error="wrong" data-success="right">Password</label>
-                                <span class="translate">Password</span>
-                            </div>
+                    </div>
+                    <div class="col m6">
+                        <div class="input-field row m6">
+                            <input type="text" class="value" id="login"/>
+                            <label for="login" class="translate">Login</label>
+                            <span class="translate">Default login is Service</span>
+                        </div>
+                        <div class="input-field row m6">
+                            <input id="password" type="text" class="value">
+                            <label for="password" data-error="wrong" data-success="right">Password</label>
+                            <span class="translate">Password</span>
                         </div>
                     </div>
                 </div>
-                <div class="col s12 m12 l12 card">
-                    <div class="card-content">
-                        <span class="card-title translate">Lookup States</span>
-                        <div class="col m6">
-                            <div class="input-field row p5">
-                                <input class="value" id="lookupInterval" type="text">
-                                <label for="lookupInterval">Update Interval 1</label>
-                                <span class="translate">Interval for states to be updated in the short term (in seconds)</span>
-                            </div>
-                        </div>
-                        <div class="col m6">
-                            <div class="input-field row p5">
-                                <input class="value" id="lookupIntervalAll" type="text">
-                                <label for="lookupIntervalAll">Update Interval 2</label>
-                                <span class="translate">Update interval for all other states (in seconds - must be multiple of short term interval)</span>
-                            </div>
+            </div>
+            <div class="row s12 m12 l12 card">
+                <div class="card-content">
+                    <span class="card-title translate">Update Windhager States</span>
+                    <div class="col m6">
+                        <div class="input-field row p5">
+                            <input class="value" id="updateInterval" type="text">
+                            <label for="updateInterval">Update Interval</label>
+                            <span class="translate">Interval for updating Windhager data (in seconds)</span>
                         </div>
                     </div>
                 </div>
-                <div class="col s12 m12 l12 card">
-                    <div class="card-content">
-                        <span class="card-title translate">Reload structure</span>
-                        <div class="input-field row">
-                            <input type="checkbox" class="value" id="reloadStructure" />
-                            <label for="reloadStructure" class="translate">reload Windhager stucture after adapter restart</label>
-                        </div>
-                        <div class="input-field row">
-                            <input type="checkbox" class="value" id="deleteStructure" />
-                            <label for="deleteStructure" class="translate">delete structure before reload</label>
-                        </div>
+            </div>
+            <div class="row s12 m12 l12 card">
+                <div class="card-content">
+                    <span class="card-title translate">Reload structure</span>
+                    <div class="input-field row">
+                        <input type="checkbox" class="value" id="reloadStructure" />
+                        <label for="reloadStructure" class="translate">reload Windhager stucture after adapter restart</label>
+                    </div>
+                    <div class="input-field row">
+                        <input type="checkbox" class="value" id="deleteStructure" />
+                        <label for="deleteStructure" class="translate">delete structure before reload</label>
                     </div>
                 </div>
             </div>

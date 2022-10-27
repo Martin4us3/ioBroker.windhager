@@ -86,6 +86,7 @@ class WindhagerDevice {
         return this.request('datapoint' + OId );
     }
     async getDatapoints( OIds ) {
+/*
         if( OIds ) {
             const   blockSize = 10;
             const   datapoints = [];
@@ -99,8 +100,9 @@ class WindhagerDevice {
             }
             return datapoints;
         } else {
-            return this.request('datapoints' );
-        }
+*/
+        return this.request('datapoints' );
+//        }
     }
 }
 
@@ -179,11 +181,9 @@ class Windhager extends utils.Adapter {
 
         const native = {};
         if (dp && dp.OID) native.OID = dp.OID;
-        if (dpConfig.lookup) native.lookup = dpConfig.lookup;
 
         // cache
         this.cache.mapping[oId] = id;
-        if (native.lookup) this.cache.lookup.push(oId);
 
         // create state
         const stateObj = {
@@ -198,45 +198,6 @@ class Windhager extends utils.Adapter {
         return stateObj;
     }
 
-    createStateObjOld( dp, dpConfig, fctConfig ) {
-        if(dp === undefined) {
-            dp = {};
-        }
-
-        // create state
-        const state = {
-            type: 'state',
-            common: {
-                name: dpConfig.name,
-                type: this.windhager.config.type[dp.typeId] || 'string',
-                read: true,
-                write: !(dpConfig.writeProt !== undefined ? dpConfig.writeProt : dp.writeProt)
-            },
-            native: {
-                OID: dp.OID
-            }
-        };
-        // lookup group
-        if(dpConfig.lookup)  state.native.lookup = dpConfig.lookup;
-        // Unit
-        if(dp.unitId && this.windhager.config.unit[dp.unitId]) state.common.unit = this.windhager.config.unit[dp.unitId];
-        // validation
-        function cast ( val ) { return state.common.type === 'number' ? Number(val) : val; }
-        if(dpConfig.minValue || dp.minValue)
-            state.common.min = dpConfig.minValue ? cast(dpConfig.minValue) : cast(dp.minValue);
-        if(dpConfig.maxValue || dp.maxValue)
-            state.common.max = dpConfig.maxValue ? cast(dpConfig.maxValue) : cast(dp.maxValue);
-        if(dp.enum && dpConfig.enum) {
-            const domain    = fctConfig.enum[dpConfig.enum];
-            const enums     = dp.enum.substring(1, dp.enum.length - 1).split(',').map(m => Number(m));
-            state.common.states = enums.reduce((states, s) => {
-                if (domain[s]) states[s] = domain[s];
-                return states;
-            }, {});
-        }
-        return state;
-    }
-
     async deleteAllStates() {
         const r = this.namespace + '.' + this.windhager.subnetId;
         const params = { startkey: r, endkey: r + '.\u9999' };
@@ -247,7 +208,6 @@ class Windhager extends utils.Adapter {
         );
         this.cache = {
             mapping: {},
-            lookup: []
         };
     }
 
@@ -293,53 +253,57 @@ class Windhager extends utils.Adapter {
             }, {});
 
             const objs = Object.entries(imp).reduce( (objs, [id,obj ]) => {
-                const mFctType = id.match(/%(\d+)/);
-                if(mFctType) {
-                    const fctType = mFctType[1];
-                    if(obj.type === 'state' && !(obj.native && obj.native.OID)) {
-                        this.log.error(`OID missing for import pattern `);
-                    } else {
-                        fctByType[fctType].forEach(fctId => {
-                            const nId = id.replace(/%\d+/, this.namespace + '.' + fctId);
-                            try {
-                                if (obj.type === 'state') {
-                                    const oId = obj.native.OID.replace(/%\d+/, '/'+fctId.replace(/[./-]/g, '/'));
-                                    objs[nId] = this.createStateObj( {
-                                        oId: oId,
-                                        dp: dps[oId],
-                                        id: nId,
-                                        obj: obj
-                                    });
-                                } else {
-                                    if( obj.type === 'device' ) {
-                                        const common    = Object.assign({}, obj.common);
-                                        common.name     = this.windhager.fct[fctId].name;
-                                        objs[nId]       = { obj: { type: obj.type, common: common, native: obj.native }};
-                                    } else {
-                                        objs[nId] = { obj: obj };
-                                    }
-                                }
-                            } catch( e ) {
-                                this.log.error(`cannot create import state ${nId}`);
-                            }
-                        });
-                    }
-                } else {
-                    const nId = this.namespace + id;
-                    if(obj.type==='state') {
-                        if(obj.native && obj.native.OID) {
-                            objs[ nId ] = this.createStateObj({
-                                oId:    obj.native.OID,
-                                dp:     dps[obj.native.OID],
-                                id:     nId,
-                                obj:    obj
-                            });
-                        } else
+                try {
+                    const mFctType = id.match(/%(\d+)/);
+                    if(mFctType) {
+                        const fctType = mFctType[1];
+                        if(obj.type === 'state' && !(obj.native && obj.native.OID)) {
                             this.log.error(`OID missing for import pattern `);
-                    } else
-                        objs[ nId ] = { obj: obj };
+                        } else {
+                            fctByType[fctType].forEach(fctId => {
+                                const nId = id.replace(/%\d+/, this.namespace + '.' + fctId);
+                                try {
+                                    if (obj.type === 'state') {
+                                        const oId = obj.native.OID.replace(/%\d+/, '/'+fctId.replace(/[./-]/g, '/'));
+                                        objs[nId] = this.createStateObj( {
+                                            oId: oId,
+                                            dp: dps[oId],
+                                            id: nId,
+                                            obj: obj
+                                        });
+                                    } else {
+                                        if( obj.type === 'device' ) {
+                                            const common    = Object.assign({}, obj.common);
+                                            common.name     = this.windhager.fct[fctId].name;
+                                            objs[nId]       = { obj: { type: obj.type, common: common, native: obj.native }};
+                                        } else {
+                                            objs[nId] = { obj: obj };
+                                        }
+                                    }
+                                } catch( e ) {
+                                    this.log.error(`cannot create import state ${nId}`);
+                                }
+                            });
+                        }
+                    } else {
+                        const nId = this.namespace + '.' + id;
+                        if(obj.type==='state') {
+                            if(obj.native && obj.native.OID) {
+                                objs[ nId ] = this.createStateObj({
+                                    oId:    obj.native.OID,
+                                    dp:     dps[obj.native.OID],
+                                    id:     nId,
+                                    obj:    obj
+                                });
+                            } else
+                                this.log.error(`OID missing for import pattern `);
+                        } else
+                            objs[ nId ] = { obj: obj };
+                    }
+                    return objs;
+                } catch (e) {
+                    this.log.error(`error importing object ${id}: ${e.message}`);
                 }
-                return objs;
             }, {} );
             Object.entries(objs).forEach(([id, data]) => {
                 this.setObjectNotExistsAsync( id, data.obj ).then( () => {
@@ -378,7 +342,7 @@ class Windhager extends utils.Adapter {
 
         // prepare all objs ...channel, states
         const objs = {};
-        const data = await this.windhager.request('datapoints');
+        const data = await this.windhager.getDatapoints();
         data.forEach( entry => {
             try {
                 const oId       = OId(entry.OID);
@@ -421,72 +385,63 @@ class Windhager extends utils.Adapter {
         this.cache = allStates.rows.reduce( (result, row) => {
             if(row.value.native && row.value.native.OID) {
                 result.mapping[row.value.native.OID] = row.id.substring(this.namespace.length+1, row.id.length);
-                if(row.value.native.lookup) result.lookup.push(row.value.native.OID);
             }
             return result;
-        }, { mapping: {}, lookup: [] });
+        }, { mapping: {} });
     }
 
-    async updateWindhagerData( updateAll = false ) {
+    async updateWindhagerData( ) {
         try {
             const start = Date.now();
-            const dps = await this.windhager.getDatapoints( );//updateAll ? undefined :this.cache.lookup );
+            const dps = await this.windhager.getDatapoints();
             dps.forEach( dp => {
                 const id = this.cache.mapping[dp.OID];
                 if(id)
                     this.setState(id, {val: this.windhager.config.type[dp.typeId] === 'number' ? Number(dp.value) : dp.value, ack: true});
             });
             this.log.debug(`update ${dps.length} Windhager states in ${Date.now()-start} milliseconds`);
-
-/*
-            const   OIDs = updateAll ? Object.keys(this.cache.mapping) : this.cache.lookup;
-            const   blockSize = 10; const start = Date.now();
-            let     count = 0;
-            for( let i = 0; i <= OIDs.length / blockSize; i++ ) {
-                const block = OIDs.slice( i*blockSize, (i+1)*blockSize );
-                await Promise.all( block.map( OID => {
-                    return this.windhager.request('datapoint' + OID ).then( o => {
-                        this.setState(this.cache.mapping[o.OID], {val: this.windhager.config.type[o.typeId] === 'number' ? Number(o.value) : o.value, ack: true});
-                        count++;
-                    }).catch( err => this.log.warn(`can not read ${OID} from Windhager; Error: ${err}`) );
-                }));
-            }
-            this.log.info(`update ${count} Windhager states in ${Date.now()-start} milliseconds`);
-*/
         } catch ( error ) {
             this.log.error(`error: ${error}`);
         }
     }
 
     async intervalUpdate() {
-        await this.updateWindhagerData( (this.lookup.counter >= this.lookup.multiplier) );
-        if(this.lookup.counter >= this.lookup.multiplier)
-            this.lookup.counter = 0;
-        else
-            this.lookup.counter++;
-
+        await this.updateWindhagerData( );
         this.timeout = setTimeout(() => {
             this.intervalUpdate();
-        }, this.lookup.interval );
+        }, this.updateInterval );
+    }
+
+    async startWindhager( reloadStructure, deleteStructure ) {
+        try {
+            this.windhager = new WindhagerDevice(await this.getWindhagerConfig(), this.config.ip, this.config.login, this.config.password);
+            await this.windhager.init();
+            this.wConnected = true;
+            this.log.info('Windhager connected');
+
+            // cache for pattern and state
+            if(reloadStructure) {
+                await this.updateDeviceStructure( deleteStructure );
+                this.log.info('rebuild default structure');
+            } else {
+                await this.readMapping();
+            }
+
+            this.log.info('start regular update of states');
+            await this.intervalUpdate();
+        } catch( e ) {
+            this.wConnected = false;
+            delete this.windhager;
+            this.log.error('could not connect to Windhager... try again in 5 min.');
+            this.timeout = setTimeout(() => {
+                this.startWindhager( reloadStructure, deleteStructure );
+            }, 5 * 60 * 1000 );
+        }
     }
 
     async onReady() {
-        // Windhager
-        this.windhager = new WindhagerDevice(await this.getWindhagerConfig(), this.config.ip, this.config.login, this.config.password);
-        await this.windhager.init();
-
         // update interval
-        if(this.config.lookupIntervalAll % this.config.lookupInterval !== 0) {
-            this.config.lookupIntervalAll = this.config.lookupInterval *
-                                Math.round(this.config.lookupIntervalAll / this.config.lookupInterval);
-            this.extendForeignObjectAsync(`system.adapter.${this.namespace}`,
-                {native: {lookupIntervalAll: this.config.lookupIntervalAll}});
-        }
-        this.lookup = {
-            interval:       this.config.lookupInterval * 1000,                                  // in seconds
-            multiplier:     this.config.lookupIntervalAll / this.config.lookupInterval,
-            counter:        0
-        };
+        this.updateInterval = this.config.updateInterval * 1000;
 
         // reload structure on startup
         const reloadStructure   = this.config.reloadStructure;
@@ -496,15 +451,8 @@ class Windhager extends utils.Adapter {
                 {native: {reloadStructure: false, deleteStructure: false}});
         }
 
-        // cache for pattern and state
-        if(reloadStructure) {
-            await this.updateDeviceStructure( deleteStructure );
-        } else {
-            await this.readMapping();
-        }
-
         this.subscribeStates('*');
-        await this.intervalUpdate();
+        this.startWindhager( reloadStructure, deleteStructure );
     }
 
     onUnload(callback) {
@@ -559,7 +507,7 @@ class Windhager extends utils.Adapter {
                 }
             } else {
                 // regExp to replace pattern
-                id = id.replace(new RegExp(this.namespace.replace(/\./g, '\\.')), '');
+                id = id.replace(new RegExp((this.namespace + '.').replace(/\./g, '\\.')), '');
             }
             // pattern could already exist - use first
             if(!result[id]) {

@@ -66,13 +66,11 @@
       "state": {
         "00-007": {
           "name": "Kesseltemperatur Istwert",
-          "level": "100",
-          "lookup": 1
+          "level": "100"
         },
         "00-009": {
           "name": "Aktuelle Kesselleistung",
-          "level": "098",
-          "lookup": 1
+          "level": "098"
         },
         "00-011": {
           "name": "Temperatur Abgas",
