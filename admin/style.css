@@ -7,4 +7,77 @@
     overflow: initial;
 }
 
-/* Add your styles here */
+/* Header section */
+#header-area {
+    margin-top: 4px;
+    margin-bottom: 1px;
+    background: white;
+}
+
+#header-area #header-logo-title .logo {
+    float: left;
+    margin-right: 10px;
+}
+
+#header-area #header-logo-title p {
+    line-height: normal !important;
+    margin: 0 !important;
+    padding: 8px 0 0 8px;
+}
+
+#header-area #header-logo-title p>span.h-title {
+    font-size: 2em !important;
+    font-weight: bold !important;
+}
+
+#header-area #header-logo-title p>span.h-sub-title {
+    font-size: 1.1em !important;
+    font-style: italic;
+    color: #2196f3;
+}
+
+/* Header section */
+.help-link {
+    order: 3 !important;
+    width: auto !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.help-link .btn-floating {
+    margin-top: 0 !important;
+}
+
+.card-stacked {
+    order: 1;
+}
+
+.logo {
+    width: 100px;
+    height: 100px;
+    padding: 12px !important;
+}
+
+/* Card Styles */
+.card {
+    margin: 8px !important;
+}
+
+.card-title {
+    color: #2196f3;
+    margin-bottom: 8px !important;
+}
+
+.header-card-title {
+    font-size: 24px !important;
+    font-weight: 300 !important;
+    color: #2196f3 !important;
+}
+
+.header-card-subTitle {
+    font-size: 16px !important;
+    margin-top: 6px !important;
+    font-style: italic !important;
+    color: gray !important;
+}
+

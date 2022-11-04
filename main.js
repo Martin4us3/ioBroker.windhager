@@ -37,29 +37,6 @@ class WindhagerDevice {
         return {fctConfig, dpConfig};
     }
 
-    async init() {
-        this.httpClient                 = http.create();
-        this.httpClient.agent.keepAlive = true;
-
-        this.subnetId                   = (await this.request('lookup'))[0];
-
-        const struct = await this.request('lookup/' + this.subnetId);
-        this.fct = struct.reduce( (fctObjs, device) => {
-            device.functions.reduce( (fctObjs, fct) => {
-                if(fct.lock !== undefined && !fct.lock) {
-                    if( this.config.function_type[fct.fctType] ) { // known function type
-                        fctObjs[`${this.subnetId}.${device.nodeId}-${fct.fctId}`] = {
-                            name: fct.name,
-                            fctType: fct.fctType
-                        };
-                    }
-                }
-                return fctObjs;
-            }, fctObjs );
-            return fctObjs;
-        }, {} );
-    }
-
     async request(whFunc, options) {
         const connOptions = {
             method: 'GET',
@@ -71,8 +48,32 @@ class WindhagerDevice {
             connOptions[id] = options[id];
         });
         const {data, res} = await this.httpClient.request(`http://${this.ip}/api/1.0/${whFunc}`, connOptions);
-        if (res.statusCode !== 200) throw (res.statusMessage);
+        if (res.statusCode !== 200) {
+            new Error(res.statusMessage);
+        }
         return data;
+    }
+
+    async init() {
+        this.httpClient                 = http.create();
+        this.httpClient.agent.keepAlive = true;
+        this.subnetId                   = (await this.request('lookup'))[0];
+
+        const struct = await this.request('lookup/' + this.subnetId);
+        this.fct = struct.reduce( (fctObjs, device) => {
+            device.functions.reduce( (fctObjs, fct) => {
+                if(fct.lock !== undefined) {
+                    if( fct.fctType >= 0 && this.config.function_type[fct.fctType] ) { // known function type
+                        fctObjs[`${this.subnetId}.${device.nodeId}-${fct.fctId}`] = {
+                            name:       fct.name,
+                            fctType:    fct.fctType
+                        };
+                    }
+                }
+                return fctObjs;
+            }, fctObjs );
+            return fctObjs;
+        }, {} );
     }
 
     async putDatapoint( oId, val ) {
@@ -85,24 +86,8 @@ class WindhagerDevice {
     async getDatapoint( OId ) {
         return this.request('datapoint' + OId );
     }
-    async getDatapoints( OIds ) {
-/*
-        if( OIds ) {
-            const   blockSize = 10;
-            const   datapoints = [];
-            for( let i = 0; i <= OIds.length / blockSize; i++ ) {
-                const block = OIds.slice( i*blockSize, (i+1)*blockSize );
-                await Promise.all( block.map( OId => {
-                    return this.request('datapoint' + OId ).then( dp => {
-                        datapoints.push(dp);
-                    });
-                }));
-            }
-            return datapoints;
-        } else {
-*/
+    async getDatapoints( ) {
         return this.request('datapoints' );
-//        }
     }
 }
 
@@ -117,9 +102,10 @@ class Windhager extends utils.Adapter {
         this.on('unload', this.onUnload.bind(this));
     }
 
-    set wConnected( con ) {
-        if( this._wCon !== con )
-            this.setForeignState(`system.adapter.${this.namespace}.connected`, {val: con, ack: true});
+    async setConnected( con ) {
+        if( this._wCon !== con ) {
+            await this.setForeignStateAsync(`system.adapter.${this.namespace}.connected`, {val: con, ack: true});
+        }
         this._wCon = con;
     }
 
@@ -234,24 +220,76 @@ class Windhager extends utils.Adapter {
         }
     }
 
-    async importDeviceStructure( deleteBefore = false ) {
+    async importDeviceStructure( imp, deleteBefore = false ) {
         try {
             // delete all channels and states
             if (deleteBefore) await this.deleteAllStates();
+
             // import
-            const imp = JSON.parse((await this.getStateAsync(this.namespace + '.config')).val);
+//            const imp = JSON.parse((await this.getStateAsync(this.namespace + '.config')).val);
             // datapoint for detail config
             const dps = (await this.windhager.getDatapoints()).reduce((dps, dp) => {
                 dps[dp.OID]=dp;
                 return dps;
             }, {});
-            // Windhager function for pattern
-            const fctByType = Object.entries(this.windhager.fct).reduce( ( fbt, [id, fct] ) => {
-                if(!fbt[fct.fctType]) fbt[fct.fctType] = [];
-                fbt[fct.fctType].push(id);
-                return fbt;
-            }, {});
 
+            let objs;
+            if(imp.type === 'flat') {
+                objs = Object.entries(imp.states).reduce( (objs, [id,obj ]) => {
+                    try {
+                        const nId = this.namespace + '.' + id;
+                        if(obj.type==='state') {
+                            if(obj.native && obj.native.OID) {
+                                objs[ nId ] = this.createStateObj({
+                                    oId:    obj.native.OID,
+                                    dp:     dps[obj.native.OID],
+                                    id:     nId,
+                                    obj:    obj
+                                });
+                            } else
+                                this.log.error(`OID missing in import state ${id}`);
+                        } else
+                            objs[ nId ] = { obj: obj };
+                    } catch (e) {
+                        this.log.error(`error importing object ${id}: ${e.message}`);
+                    }
+                    return objs;
+                }, {} );
+            } else if(imp.type === 'struct') {
+                objs = Object.entries(imp.fct).reduce( (objs, [id,obj]) => {
+                    const fctId =  id;
+                    objs[ this.namespace + '.' + imp.subnet + '.' + fctId ] = { obj: obj };
+
+                    const fctType = obj.native.fctType;
+                    if(fctType) {
+                        objs = Object.entries(imp.fctType[fctType]).reduce((objs, [id,obj]) => {
+                            try {
+                                const stateId = this.namespace + '.' + imp.subnet + '.' + fctId + '.' + id;
+                                if(obj.type === 'state') {
+                                    if(obj.native && obj.native.OID) {
+                                        const OId = `/${imp.subnet}/${fctId.replace(/-/, '/')}${obj.native.OID}`;
+                                        objs[ stateId ] = this.createStateObj({
+                                            oId:    OId,
+                                            dp:     dps[OId],
+                                            id:     stateId,
+                                            obj:    obj
+                                        });
+                                    } else
+                                        this.log.error(`OID missing in import state ${id}`);
+                                } else
+                                    objs[ stateId ] = { obj: obj };
+                            } catch (e) {
+                                this.log.error(`error importing object ${id} of fctType ${fctType}: ${e.message}`);
+                            }
+                            return objs;
+                        }, objs );
+                    }
+                    return objs;
+                }, {} );
+            } else {
+                throw new Error(`unknown import type ${imp.type}`)
+            }
+            /*
             const objs = Object.entries(imp).reduce( (objs, [id,obj ]) => {
                 try {
                     const mFctType = id.match(/%(\d+)/);
@@ -305,17 +343,20 @@ class Windhager extends utils.Adapter {
                     this.log.error(`error importing object ${id}: ${e.message}`);
                 }
             }, {} );
+*/
             Object.entries(objs).forEach(([id, data]) => {
                 this.setObjectNotExistsAsync( id, data.obj ).then( () => {
                     if(data.val) this.setState(id, {val: data.val, ack: true});
                 } );
             });
+
+            this.log.info(`${Object.keys(objs).length} states imported`);
         } catch (e) {
             this.log.error(`error during import of state structure: ${e.message}`);
         }
     }
 
-    async updateDeviceStructure( deleteBefore = false ) {
+    async initDeviceStructure( deleteBefore = false ) {
         // delete all channels and states
         if(deleteBefore) await this.deleteAllStates();
 
@@ -335,10 +376,6 @@ class Windhager extends utils.Adapter {
                 return objs;
             }, {})
         };
-        // write ioBroker objects
-        Object.entries(structObjs).forEach(([id, data]) => {
-            this.setObjectNotExistsAsync( id, data );
-        });
 
         // prepare all objs ...channel, states
         const objs = {};
@@ -367,7 +404,12 @@ class Windhager extends utils.Adapter {
             }
         });
 
-        // sort and write all objects
+        // write function objects
+        Object.entries(structObjs).forEach(([id, data]) => {
+            this.setObjectNotExistsAsync( id, data );
+        });
+
+        // sort and write all state objects
         const ordered = Object.keys(objs).sort().reduce(
             (obj, key) => { obj[key] = objs[key]; return obj; }, {}
         );
@@ -379,9 +421,7 @@ class Windhager extends utils.Adapter {
     }
 
     async readMapping( ) {
-        const r = this.namespace + '.' + this.windhager.subnetId;
-        const params = { startkey: r, endkey: r + '.\u9999' };
-        const allStates = await this.getObjectViewAsync('system', 'state', params );
+        const allStates = await this.getObjectViewAsync( 'windhager', 'subnetStates', { startkey: '', endkey: '\u9999' } );
         this.cache = allStates.rows.reduce( (result, row) => {
             if(row.value.native && row.value.native.OID) {
                 result.mapping[row.value.native.OID] = row.id.substring(this.namespace.length+1, row.id.length);
@@ -412,17 +452,22 @@ class Windhager extends utils.Adapter {
         }, this.updateInterval );
     }
 
-    async startWindhager( reloadStructure, deleteStructure ) {
+    async startWindhager( ) {
         try {
             this.windhager = new WindhagerDevice(await this.getWindhagerConfig(), this.config.ip, this.config.login, this.config.password);
             await this.windhager.init();
-            this.wConnected = true;
+            await this.setConnected( true );
             this.log.info('Windhager connected');
 
-            // cache for pattern and state
-            if(reloadStructure) {
-                await this.updateDeviceStructure( deleteStructure );
-                this.log.info('rebuild default structure');
+            this.cache = {
+                mapping: {},
+            };
+
+            if(this.initStruct) {
+                if(this.initStruct.cmd === 'import')
+                    await this.importDeviceStructure( this.initStruct.obj, this.initStruct.delete );
+                else if(this.initStruct.cmd === 'reInit')
+                    await this.initDeviceStructure( this.initStruct.delete );
             } else {
                 await this.readMapping();
             }
@@ -430,11 +475,11 @@ class Windhager extends utils.Adapter {
             this.log.info('start regular update of states');
             await this.intervalUpdate();
         } catch( e ) {
-            this.wConnected = false;
+            await this.setConnected(false);
             delete this.windhager;
             this.log.error('could not connect to Windhager... try again in 5 min.');
             this.timeout = setTimeout(() => {
-                this.startWindhager( reloadStructure, deleteStructure );
+                this.startWindhager( );
             }, 5 * 60 * 1000 );
         }
     }
@@ -443,16 +488,42 @@ class Windhager extends utils.Adapter {
         // update interval
         this.updateInterval = this.config.updateInterval * 1000;
 
-        // reload structure on startup
-        const reloadStructure   = this.config.reloadStructure;
-        const deleteStructure   = this.config.deleteStructure;
-        if(this.config.reloadStructure || this.config.deleteStructure) { // reset params
-            this.extendForeignObjectAsync(`system.adapter.${this.namespace}`,
-                {native: {reloadStructure: false, deleteStructure: false}});
-        }
+        try {
+            const init = JSON.parse((await this.getStateAsync(this.namespace + '._initializeStructure')).val);
+            if( init.cmd ) {
+                switch( init.cmd  ) {
+                    case 'file':
+                        this.initStruct = {
+                            cmd: 'import',
+                            obj: init.file,
+                            delete: init.deleteBefore
+                        };
+                        break;
+                    case 'default':
+                        this.initStruct = {
+                            cmd: 'import',
+                            obj: {},
+                            delete: init.deleteBefore
+                        };
+                        break;
+                    case 'Windhager':
+                        this.initStruct = {
+                            cmd: 'reInit',
+                            delete: init.deleteBefore
+                        };
+                        break;
+                    default:
+                        this.log.warn(`unknown initialize command ${init.model.cmd}`)
+                    if(this.initStruct)
+                        await this.setStateAsync(this.namespace + '._initializeStructure', {val: '', ack: true});
+                }
+            } else {
+                this.log.warn('wrong format of initialize info')
+            }
+        } catch(e) {}
 
         this.subscribeStates('*');
-        this.startWindhager( reloadStructure, deleteStructure );
+        this.startWindhager( );
     }
 
     onUnload(callback) {
@@ -488,37 +559,76 @@ class Windhager extends utils.Adapter {
         }
     }
 
+    // admin site function - here for debugging
     async exportModel( generic = true ) {
-        const r          = this.namespace + '.' + this.windhager.subnetId;
-        // regExp to replace pattern
-        const rExpIdStr  = r.replace(/\./g, '\\.');
-        const rExpId     = new RegExp(rExpIdStr+'\\.\\d+-\\d+', '');
-        // read objects
-        const params = { startkey: r, endkey: r + '.\u9999' };
-        const view   = await this.getObjectViewAsync('windhager', 'subnetObjects', params );
+        const view = await this.getObjectViewAsync( 'windhager', 'subnetObjects', { startkey: '', endkey: '\u9999' } );
+        let   objs;
+
+        const adapter = 'windhager';
+        const instance = 0;
+
         // generate export
-        const objs = view.rows.reduce( (result, {id, value}) => {
-            if( generic ) {
-                const i = id.split('.');
-                const fctType = this.windhager.fct[i[2]+'.'+i[3]].fctType;
-                id = id.replace(rExpId, `%${fctType}`);
-                if(value.native && value.native.OID) {
-                    value.native.OID = value.native.OID.replace(/\/\d+\/\d+\/\d+/, `%${fctType}`);
+        if( generic ) {
+            const firstFct = {};
+            objs = view.rows.reduce((result, {id, value}) => {
+                try {
+                    const [match, subnet, fct, sId] = id.match(new RegExp(`^${adapter}\\.${instance}\\.(\\d+)\\.?(\\d\\d-\\d)?\\.?(.+)?`, ''));
+                                                                                            // `/^windhager\.\d+\.((\d+)\.?(\d\d-\d)?\.?(.+)?)/`
+                    if (match) {
+                        if( !result.subnet ) result.subnet = subnet;
+                        if( value.type === 'device' ) {
+                            if(!result.fct[fct]) {
+                                result.fct[fct] = {
+                                    name: value.common.name,
+                                    fctType: value.native.fctType
+                                };
+                                if(!firstFct[value.native.fctType]) {
+                                    firstFct[value.native.fctType] = fct;
+                                    result.fctType[value.native.fctType] = {};
+                                }
+                            }
+                        } else {
+                            if(result.fct[fct]) {
+                                if(firstFct[result.fct[fct].fctType] === fct) {     // only states of first founded function
+                                    if (value.native && value.native.OID) {         // prepare OID
+                                        const [oMatch, oSubnet, oFct, oId] = value.native.OID.match(/^\/(\d+)\/(\d+\/\d+)(.+)/, ``);
+                                        value.native.OID = oId;
+                                    }
+                                    result.fctType[result.fct[fct].fctType][sId] = {
+                                        type: value.type,
+                                        common: {name: value.common.name},
+                                        native: value.native
+                                    };
+                                }
+                            } else {
+                                throw new Error('unknown Windhager function');
+                            }
+                        }
+                    }
+                } catch( e ) {
+                    this.log.error(`cannot export id: ${id}, error: ${e.message}`);
                 }
-            } else {
-                // regExp to replace pattern
-                id = id.replace(new RegExp((this.namespace + '.').replace(/\./g, '\\.')), '');
-            }
-            // pattern could already exist - use first
-            if(!result[id]) {
-                result[id] = {
-                    type:   value.type,
-                    common: {name: value.common.name},
-                    native: value.native
-                };
-            }
-            return result;
-        },{});
+                return result;
+            }, { model: "windhager.adapter.export", type: "struct", subnet: null, fct: {}, fctType: {} });
+         } else {
+            objs = { model: "windhager.adapter.export", type: "flat", states: view.rows.reduce((result, {id, value}) => {
+                try {
+                    const [match, sId] = id.match(new RegExp(`^${adapter}\\.${instance}\\.(.+)`, '')); // `^windhager\.\d+\.((\d+)\.(\d+-\d+)\..+)`
+                    if (match) {
+                        result[sId] = {
+                            type: value.type,
+                            common: {name: value.common.name},
+                            native: value.native
+                        };
+                    } else {
+                        throw new Error('wrong id structure');
+                    }
+                } catch (e) {
+                    this.log.error(`cannot export id: ${id}, error: ${e.message}`);
+                }
+                return result;
+            }, {} ) };
+        }
         // write in state
         const e = this.namespace + '.export';
         await this.setObjectNotExistsAsync( e, {
@@ -526,7 +636,7 @@ class Windhager extends utils.Adapter {
             common: {name: 'export', desc: 'result of model export', type: 'json', read: true},
             native:{}
         } );
-        this.setState(e, {val: JSON.stringify(objs), ack: true});
+        this.setState(e, { val: JSON.stringify(objs), ack: true } );
     }
 }
 

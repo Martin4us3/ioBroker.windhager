@@ -31,6 +31,7 @@
   },
   "function_type": {
     "9": {
+      "name": "BioWin",
       "level": {
         "097": {
           "name": "Unbekannte Ebene"
@@ -580,6 +581,353 @@
       }
     },
     "14": {
+      "name:": "",
+      "level": {
+        "096": {
+          "name": "Betriebswahl"
+        },
+        "097": {
+          "name": "Behaglichkeit"
+        },
+        "098": {
+          "name": "WW-Ladefreigabe"
+        },
+        "099": {
+          "name": "Eco / Party"
+        },
+        "100": {
+          "name": "Ferienprogramm"
+        },
+        "101": {
+          "name": "Raumtemperatur-Sollwerte"
+        },
+        "102": {
+          "name": "Uhrzeit / Datum"
+        },
+        "103": {
+          "name": "Modulfunktionen"
+        },
+        "104": {
+          "name": "Auslegungstemperaturen"
+        },
+        "105": {
+          "name": "Raumtemperatureinfluss"
+        },
+        "106": {
+          "name": "Heizgrenzen"
+        },
+        "107": {
+          "name": "Warmwasserladung"
+        },
+        "108": {
+          "name": "Kesseltemp-Überhöhung"
+        },
+        "109": {
+          "name": "Startoptimierung"
+        },
+        "110": {
+          "name": "LON-Systemdaten"
+        },
+        "111": {
+          "name": "Estrichausheizprogramm"
+        },
+        "112": {
+          "name": "Modulinfo"
+        },
+        "113": {
+          "name": "Raumtemperatur"
+        },
+        "114": {
+          "name": "Warmwassertemperatur"
+        },
+        "115": {
+          "name": "Aussentemperatur"
+        },
+        "116": {
+          "name": "Vorlauftemperatur"
+        },
+        "117": {
+          "name": "Kesseltemperatur"
+        },
+        "122": {
+          "name": "Unbekannte Ebene"
+        },
+        "126": {
+          "name": "Unbekannte Ebene"
+        }
+      },
+      "state": {
+        "00-000": {
+          "name": "Aussentemperatur",
+          "level": "115",
+          "maxValue": "50"
+        },
+        "00-002": {
+          "name": "Aktueller Wert",
+          "level": "116",
+          "lname": "Vorlauftemperatur Aktueller Wert"
+        },
+        "00-004": {
+          "name": "Aktueller Wert",
+          "level": "114",
+          "lname": "Warmwassertemperatur Aktueller Wert",
+          "lookup": 1
+        },
+        "00-007": {
+          "name": "Kesseltemperatur Istwert",
+          "level": "117",
+          "lname": "Kesseltemperatur Kesseltemperatur Istwert",
+          "lookup": 1
+        },
+        "01-001": {
+          "name": "Sollwert",
+          "level": "113",
+          "lname": "Raumtemperatur Sollwert",
+          "maxValue": "50"
+        },
+        "01-002": {
+          "name": "Sollwert",
+          "level": "116",
+          "lname": "Vorlauftemperatur Sollwert",
+          "maxValue": "50"
+        },
+        "01-004": {
+          "name": "Sollwert",
+          "level": "114",
+          "lname": "Warmwassertemperatur Sollwert"
+        },
+        "01-007": {
+          "name": "Solltemperatur",
+          "level": "117",
+          "lname": "Kesseltemperatur Solltemperatur"
+        },
+        "01-020": {
+          "name": "Heizkreispumpe",
+          "level": "122"
+        },
+        "01-021": {
+          "name": "Mischer",
+          "level": "122"
+        },
+        "01-066": {
+          "name": "Warmwasser Ladepumpe",
+          "level": "122"
+        },
+        "02-010": {
+          "name": "Dauer",
+          "level": "099",
+          "lname": "Eco / Party Dauer"
+        },
+        "02-016": {
+          "name": "Freigabe starten",
+          "level": "098",
+          "lname": "WW-Ladefreigabe Freigabe starten"
+        },
+        "02-070": {
+          "name": "Datum",
+          "level": "102"
+        },
+        "02-072": {
+          "name": "Uhrzeit",
+          "level": "102",
+          "lookup": 1
+        },
+        "03-001": {
+          "name": "Fusspunkt",
+          "level": "104",
+          "lname": "Auslegungstemperaturen Fusspunkt"
+        },
+        "03-002": {
+          "name": "TA Absenkbetrieb",
+          "level": "106",
+          "lname": "Heizgrenzen TA Absenkbetrieb"
+        },
+        "03-004": {
+          "name": "Temperatur",
+          "level": "099",
+          "lname": "Eco / Party Temperatur"
+        },
+        "03-006": {
+          "name": "Vorhaltezeit",
+          "level": "109",
+          "lname": "Startoptimierung Vorhaltezeit"
+        },
+        "03-007": {
+          "name": "Kompensation",
+          "level": "105",
+          "lname": "Raumtemperatureinfluss Kompensation"
+        },
+        "03-012": {
+          "name": "Klimapunkt",
+          "level": "104",
+          "lname": "Auslegungstemperaturen Klimapunkt"
+        },
+        "03-013": {
+          "name": "Vorlauf",
+          "level": "104",
+          "lname": "Auslegungstemperaturen Vorlauf"
+        },
+        "03-021": {
+          "name": "TA Heizbetrieb",
+          "level": "106",
+          "lname": "Heizgrenzen TA Heizbetrieb"
+        },
+        "03-029": {
+          "name": "Rücklauf",
+          "level": "104",
+          "lname": "Auslegungstemperaturen Rücklauf"
+        },
+        "03-030": {
+          "name": "Nachstellzeit",
+          "level": "105",
+          "lname": "Raumtemperatureinfluss Nachstellzeit"
+        },
+        "03-050": {
+          "name": "Betriebswahl",
+          "level": "096",
+          "enum": "Betriebswahl",
+          "lookup": 1
+        },
+        "03-051": {
+          "name": "Heizbetrieb",
+          "level": "101",
+          "lname": "Raumtemperatur-Sollwerte Heizbetrieb"
+        },
+        "03-053": {
+          "name": "Absenkbetrieb",
+          "level": "101",
+          "lname": "Raumtemperatur-Sollwerte Absenkbetrieb"
+        },
+        "03-058": {
+          "name": "Korrekturwert",
+          "level": "097",
+          "lname": "Behaglichkeit Korrekturwert"
+        },
+        "03-078": {
+          "name": "bis Datum",
+          "level": "100",
+          "lname": "Ferienprogramm bis Datum"
+        },
+        "04-005": {
+          "name": "Funktionsbezeichnung",
+          "level": "112",
+          "lname": "Modulinfo Funktionsbezeichnung"
+        },
+        "04-012": {
+          "name": "Systemzeit",
+          "level": "110",
+          "lname": "LON-Systemdaten Systemzeit"
+        },
+        "04-013": {
+          "name": "Aussentemp.",
+          "level": "110",
+          "lname": "LON-Systemdaten Aussentemp."
+        },
+        "04-014": {
+          "name": "Betriebswahl",
+          "level": "110",
+          "lname": "LON-Systemdaten Betriebswahl"
+        },
+        "04-060": {
+          "name": "Programm",
+          "level": "111",
+          "lname": "Estrichausheizprogramm Programm"
+        },
+        "04-063": {
+          "name": "T-Beharrung",
+          "level": "111",
+          "lname": "Estrichausheizprogramm T-Beharrung"
+        },
+        "04-064": {
+          "name": "Dauer Beharrung",
+          "level": "111",
+          "lname": "Estrichausheizprogramm Dauer Beharrung"
+        },
+        "04-065": {
+          "name": "T-Aufheizphase",
+          "level": "111",
+          "lname": "Estrichausheizprogramm T-Aufheizphase"
+        },
+        "04-066": {
+          "name": "T-Abkühlphase",
+          "level": "111",
+          "lname": "Estrichausheizprogramm T-Abkühlphase"
+        },
+        "04-067": {
+          "name": "Dauer T-Änderung",
+          "level": "111",
+          "lname": "Estrichausheizprogramm Dauer T-Änderung"
+        },
+        "04-092": {
+          "name": "Softwareversion Feuerungsautomat",
+          "level": "112",
+          "lname": "Modulinfo Softwareversion Feuerungsautomat"
+        },
+        "04-093": {
+          "name": "Version HW",
+          "level": "112",
+          "lname": "Modulinfo Version HW"
+        },
+        "05-006": {
+          "name": "Zirkulationspumpe",
+          "level": "126"
+        },
+        "05-008": {
+          "name": "max. Ladevorrang",
+          "level": "107",
+          "lname": "Warmwasserladung max. Ladevorrang"
+        },
+        "05-051": {
+          "name": "Temperatur",
+          "level": "098",
+          "lname": "WW-Ladefreigabe Temperatur"
+        },
+        "05-076": {
+          "name": "WW-Kreis",
+          "level": "103",
+          "lname": "Modulfunktionen WW-Kreis"
+        },
+        "07-001": {
+          "name": "Heizkreis",
+          "level": "108",
+          "lname": "Kesseltemp-Überhöhung Heizkreis"
+        },
+        "07-002": {
+          "name": "Vorlauf min.",
+          "level": "106",
+          "lname": "Heizgrenzen Vorlauf min."
+        },
+        "07-008": {
+          "name": "Vorlauf max.",
+          "level": "106",
+          "lname": "Heizgrenzen Vorlauf max."
+        },
+        "07-076": {
+          "name": "Heizkreis",
+          "level": "103",
+          "lname": "Modulfunktionen Heizkreis"
+        },
+        "20-127": {
+          "name": "Unbekannter Parameter",
+          "level": "112",
+          "lname": "Modulinfo Unbekannter Parameter"
+        }
+      },
+      "enum": {
+        "Betriebswahl": {
+          "0": "Standby",
+          "1": "Heizprogramm 1",
+          "2": "Heizprogramm 2",
+          "3": "Heizprogramm 3",
+          "4": "Heizbetrieb",
+          "5": "Absenkbetrieb",
+          "6": "Warmwasserbetrieb",
+          "7": ""
+        }
+      }
+    },
+    "14-6": {
+      "name:": "DHW",
       "level": {
         "096": {
           "name": "Betriebswahl"
@@ -925,6 +1273,7 @@
       }
     },
     "15": {
+      "name": "",
       "level": {
         "096": {
           "name": "Betriebswahl"
@@ -1158,6 +1507,7 @@
       }
     },
     "16": {
+      "name": "B-PLM",
       "level": {
         "096": {
           "name": "Betriebswahl"

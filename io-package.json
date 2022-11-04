@@ -128,10 +128,10 @@
             },
             "views": {
                 "subnetObjects": {
-                    "map": "function(doc) { if (doc.type === 'state' || doc.type === 'channel' || doc.type === 'device' || doc.type === 'folder' ) emit(doc._id, doc) }"
+                    "map": "function(doc) { if ((doc.type === 'state' || doc.type === 'channel' || doc.type === 'device' || doc.type === 'folder') && doc._id.match(/^windhager\\.[0-9]+\\.[0-9]+/) ) emit(doc._id, doc) }"
                 },
                 "subnetStates": {
-                    "map": "function(doc) { if (doc.type === 'state') emit(doc._id, doc) }"
+                    "map": "function(doc) { if ((doc.type === 'state') && doc._id.match(/^windhager\\.[0-9]+\\.[0-9]+/)) emit(doc._id, doc) }"
                 }
             }
         },
