@@ -62,13 +62,11 @@ class WindhagerDevice {
         const struct = await this.request('lookup/' + this.subnetId);
         this.fct = struct.reduce( (fctObjs, device) => {
             device.functions.reduce( (fctObjs, fct) => {
-                if(fct.lock !== undefined) {
-                    if( fct.fctType >= 0 && this.config.function_type[fct.fctType] ) { // known function type
-                        fctObjs[`${this.subnetId}.${device.nodeId}-${fct.fctId}`] = {
-                            name:       fct.name,
-                            fctType:    fct.fctType
-                        };
-                    }
+                if( fct.fctType >= 0 && this.config.function_type[fct.fctType] ) { // known function type
+                    fctObjs[`${this.subnetId}.${device.nodeId}-${fct.fctId}`] = {
+                        name:       fct.name,
+                        fctType:    fct.fctType
+                    };
                 }
                 return fctObjs;
             }, fctObjs );
@@ -113,9 +111,11 @@ class Windhager extends utils.Adapter {
         // Windhager state configuration
         const configStateId = 'system.adapter.windhager.state-config';
         const configState   = await this.getForeignStateAsync(configStateId);
+
         if( configState && configState.val !== '' ) {
             return JSON.parse(configState.val);
         } else {
+            this.log.debug('Windhager config not found - use code default');
             const config = require('./lib/windhager-config.json');
             this.setForeignObjectNotExistsAsync(configStateId, {
                 type: 'state',
@@ -134,45 +134,6 @@ class Windhager extends utils.Adapter {
             return config;
         }
     }
-
-    async getInitStructureConfig( init ) {
-        let initStruct;
-        try {
-//            const init = JSON.parse((await this.getStateAsync(this.namespace + '._initializeStructureConfig')).val);
-            if( init.cmd ) {
-                switch( init.cmd  ) {
-                    case 'file':
-                        initStruct = {
-                            cmd: 'import',
-                            obj: init.file,
-                            delete: init.deleteBefore
-                        };
-                        break;
-                    case 'default':
-                        initStruct = {
-                            cmd: 'import',
-                            obj: {},
-                            delete: init.deleteBefore
-                        };
-                        break;
-                    case 'Windhager':
-                        initStruct = {
-                            cmd: 'reInit',
-                            delete: init.deleteBefore
-                        };
-                        break;
-                    default:
-                        this.log.warn(`unknown initialize command ${init.model.cmd}`)
-                }
-                if(initStruct)
-                    await this.setStateAsync(this.namespace + '._initializeStructure', {val: '', ack: true});
-            } else {
-                this.log.warn('wrong format of initialize info')
-            }
-        } catch(e) {}
-        return initStruct;
-    }
-
 
     createStateObj( { oId, dp, id, obj } ) {
         const {fctConfig, dpConfig} = this.windhager.datapointConfig(OId( oId || dp.OID ));
@@ -260,8 +221,6 @@ class Windhager extends utils.Adapter {
     }
 
     async importDeviceStructure( imp, deleteBefore = false ) {
-        // import
-//            const imp = JSON.parse((await this.getStateAsync(this.namespace + '.config')).val);
         // datapoint for detail config
         const dps = (await this.windhager.getDatapoints()).reduce((dps, dp) => {
             dps[dp.OID]=dp;
@@ -271,14 +230,8 @@ class Windhager extends utils.Adapter {
         try {
             // delete all channels and states
             if (deleteBefore) await this.deleteAllStates();
-/*
-            // Windhager function for pattern
-            const fctByType = Object.entries(this.windhager.fct).reduce( ( fbt, [id, fct] ) => {
-                if(!fbt[fct.fctType]) fbt[fct.fctType] = [];
-                fbt[fct.fctType].push(id);
-                return fbt;
-            }, {});
-*/
+
+            // initialize new state structure
             let objs;
             if(imp.type === 'flat') {
                 objs = Object.entries(imp.states).reduce( (objs, [id,obj ]) => {
@@ -305,16 +258,16 @@ class Windhager extends utils.Adapter {
                 objs = Object.entries(this.windhager.fct).reduce( (sObjs, [id,obj]) => {
                     const fctId =  id;
                     const fctType = obj.fctType;
-                    sObjs[ this.namespace + '.' + fctId ] = { obj: {
-                        'type': 'device',
-                        'common': {
-                            'name': obj.name
-                        },
-                        'native': {
-                            'fctType': fctType
-                        }
-                    } };
                     if(fctType && imp.fctType[fctType]) {
+                        sObjs[ this.namespace + '.' + fctId ] = { obj: {
+                            'type': 'device',
+                            'common': {
+                                'name': obj.name
+                            },
+                            'native': {
+                                'fctType': fctType
+                            }
+                        } };
                         sObjs = Object.entries(imp.fctType[fctType]).reduce((fObjs, [id,obj]) => {
                             try {
                                 const stateId = this.namespace + '.' + fctId + '.' + id;
@@ -348,8 +301,7 @@ class Windhager extends utils.Adapter {
                     if(data.val) this.setState(id, {val: data.val, ack: true});
                 } );
             });
-
-            this.log.info(`${Object.keys(objs).length} states imported`);
+            this.log.info(`${Object.keys(objs).length} states created`);
         } catch (e) {
             this.log.error(`error during import of state structure: ${e.message}`);
         }
@@ -417,6 +369,7 @@ class Windhager extends utils.Adapter {
                 if(data.val) this.setState(id, {val: data.val, ack: true});
             } );
         });
+        this.log.info(`${Object.keys(ordered).length} states created`);
     }
 
     async readMapping( ) {
@@ -431,14 +384,16 @@ class Windhager extends utils.Adapter {
 
     async updateWindhagerData( ) {
         try {
-            const start = Date.now();
+            const start = Date.now(); let count = 0;
             const dps = await this.windhager.getDatapoints();
             dps.forEach( dp => {
                 const id = this.cache.mapping[dp.OID];
-                if(id)
+                if(id) {
                     this.setState(id, {val: this.windhager.config.type[dp.typeId] === 'number' ? Number(dp.value) : dp.value, ack: true});
+                    count++;
+                }
             });
-            this.log.debug(`update ${dps.length} Windhager states in ${Date.now()-start} milliseconds`);
+            this.log.debug(`update ${count} Windhager states in ${Date.now()-start} milliseconds`);
         } catch ( error ) {
             this.log.error(`error: ${error}`);
         }
@@ -453,9 +408,14 @@ class Windhager extends utils.Adapter {
 
     async startWindhager( ) {
         try {
+            this.log.debug('try to connect to Windhager...');
+
+            this.connectTries++;
             this.windhager = new WindhagerDevice(await this.getWindhagerConfig(), this.config.ip, this.config.login, this.config.password);
             await this.windhager.init();
+
             await this.setConnected( true );
+
             this.log.info('Windhager connected');
 
             this.cache = {
@@ -463,6 +423,7 @@ class Windhager extends utils.Adapter {
             };
 
             if(this.initStructConfig && this.initStructConfig.cmd && this.initStructConfig.cmd !== 'none' ) {
+                this.log.debug('initialize state structure...');
                 if(this.initStructConfig.cmd === 'import')
                     await this.importDeviceStructure( this.initStructConfig.obj, this.initStructConfig.delete );
                 else if(this.initStructConfig.cmd === 'default')
@@ -478,29 +439,45 @@ class Windhager extends utils.Adapter {
         } catch( e ) {
             await this.setConnected(false);
             delete this.windhager;
-            this.log.error('could not connect to Windhager... try again in 5 min.');
-            this.timeout = setTimeout(() => {
-                this.startWindhager( );
-            }, 5 * 60 * 1000 );
+
+            let stopProcess = true;
+            if( e.name && e.name === "JSONResponseFormatError" ) {
+                if( e.status === 401 ) {
+                    this.log.error('wrong user/password for Windhager - adapter disabled');
+                } else if(e.status === 'xxx') {
+                    if( this.connectTries < 5 ) {
+                        this.log.error('timeout trying to connect Windhager... try again in 5 min. - ' + e.message);
+                        this.timeout = setTimeout(() => {
+                            this.startWindhager( );
+                        }, 5 * 60 * 1000 );
+                        stopProcess = false;
+                    } else {
+                        this.log.error('could not connect to Windhager... adapter stopped' + e.message);
+                    }
+                }
+            }
+            if(stopProcess) {
+                await this.extendForeignObjectAsync(`system.adapter.${this.namespace}`, {common: { enabled: false }});
+                this.stop();
+            }
         }
     }
 
     async onReady() {
         // update interval
         this.updateInterval   = this.config.updateInterval * 1000;
-
         this.initStructConfig = this.config.initStruct;                                 // this.getInitStructureConfig(this.config.initStruct);
+
+        this.connectTries = 0;
+        await this.startWindhager( );
+        this.subscribeStates('*');
+
         if( !this.config.initStruct || this.config.initStruct.cmd !== 'none' )          // initialize after restart only once
             await this.extendForeignObjectAsync(`system.adapter.${this.namespace}`, {native: { initStruct: {cmd: 'none', obj: null, delete: false} } });
-//            await this.setStateAsync(this.namespace + '._initializeStructure', {val: '', ack: true});
-
-        this.subscribeStates('*');
-        this.startWindhager( );
     }
 
     onUnload(callback) {
         try {
-            this.log.info('cleaned everything up...');
             callback();
         } catch (e) {
             callback();
@@ -518,97 +495,11 @@ class Windhager extends utils.Adapter {
                 } else if(k[2] === 'trigger_update') {
                     this.log.info('manually trigger update');
                     await this.updateWindhagerData();
-                } else if(k[2] === 'trigger_export') {
-                    this.log.info('export Windhager model');
-                    await this.exportModel(true );
-                } else if(k[2] === 'trigger_import') {
-                    this.log.info('import Windhager model');
-                    await this.importDeviceStructure(true);
                 }
             } catch ( error ) {
                 this.log.error(`Error ${ error }`);
             }
         }
-    }
-
-    // admin site function - here for debugging
-    async exportModel( generic = true ) {
-        const view = await this.getObjectViewAsync( 'windhager', 'subnetObjects', { startkey: '', endkey: '\u9999' } );
-        let   objs;
-
-        const adapter = 'windhager';
-        const instance = 0;
-
-        // generate export
-        if( generic ) {
-            const firstFct = {};
-            objs = view.rows.reduce((result, {id, value}) => {
-                try {
-                    const [match, subnet, fct, sId] = id.match(new RegExp(`^${adapter}\\.${instance}\\.(\\d+)\\.?(\\d\\d-\\d)?\\.?(.+)?`, ''));
-                                                                                            // `/^windhager\.\d+\.((\d+)\.?(\d\d-\d)?\.?(.+)?)/`
-                    if (match) {
-                        if( !result.subnet ) result.subnet = subnet;
-                        if( value.type === 'device' ) {
-                            if(!result.fct[fct]) {
-                                result.fct[fct] = {
-                                    name: value.common.name,
-                                    fctType: value.native.fctType
-                                };
-                                if(!firstFct[value.native.fctType]) {
-                                    firstFct[value.native.fctType] = fct;
-                                    result.fctType[value.native.fctType] = {};
-                                }
-                            }
-                        } else {
-                            if(result.fct[fct]) {
-                                if(firstFct[result.fct[fct].fctType] === fct) {     // only states of first founded function
-                                    if (value.native && value.native.OID) {         // prepare OID
-                                        const [oMatch, oSubnet, oFct, oId] = value.native.OID.match(/^\/(\d+)\/(\d+\/\d+)(.+)/, ``);
-                                        value.native.OID = oId;
-                                    }
-                                    result.fctType[result.fct[fct].fctType][sId] = {
-                                        type: value.type,
-                                        common: {name: value.common.name},
-                                        native: value.native
-                                    };
-                                }
-                            } else {
-                                throw new Error('unknown Windhager function');
-                            }
-                        }
-                    }
-                } catch( e ) {
-                    this.log.error(`cannot export id: ${id}, error: ${e.message}`);
-                }
-                return result;
-            }, { model: "windhager.adapter.export", type: "struct", subnet: null, fct: {}, fctType: {} });
-         } else {
-            objs = { model: "windhager.adapter.export", type: "flat", states: view.rows.reduce((result, {id, value}) => {
-                try {
-                    const [match, sId] = id.match(new RegExp(`^${adapter}\\.${instance}\\.(.+)`, '')); // `^windhager\.\d+\.((\d+)\.(\d+-\d+)\..+)`
-                    if (match) {
-                        result[sId] = {
-                            type: value.type,
-                            common: {name: value.common.name},
-                            native: value.native
-                        };
-                    } else {
-                        throw new Error('wrong id structure');
-                    }
-                } catch (e) {
-                    this.log.error(`cannot export id: ${id}, error: ${e.message}`);
-                }
-                return result;
-            }, {} ) };
-        }
-        // write in state
-        const e = this.namespace + '.export';
-        await this.setObjectNotExistsAsync( e, {
-            type: 'state',
-            common: {name: 'export', desc: 'result of model export', type: 'json', read: true},
-            native:{}
-        } );
-        this.setState(e, { val: JSON.stringify(objs), ack: true } );
     }
 }
 
