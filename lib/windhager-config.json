@@ -92,8 +92,7 @@
         "02-001": {
           "name": "Betriebsphasen",
           "level": "100",
-          "enum": "Betriebsphasen",
-          "lookup": 1
+          "enum": "Betriebsphasen"
         },
         "02-059": {
           "name": "Betriebsarten",
@@ -102,8 +101,7 @@
         },
         "02-072": {
           "name": "Uhrzeit",
-          "level": "103",
-          "lookup": 1
+          "level": "103"
         },
         "02-080": {
           "name": "Anzahl der Brennerstarts",
@@ -144,8 +142,7 @@
         "09-075": {
           "name": "Betriebswahl",
           "level": "097",
-          "enum": "Betriebswahl",
-          "lookup": 1
+          "enum": "Betriebswahl"
         },
         "09-090": {
           "name": "Kaminkehrerbetrieb Restlaufzeit",
@@ -670,14 +667,12 @@
         "00-004": {
           "name": "Aktueller Wert",
           "level": "114",
-          "lname": "Warmwassertemperatur Aktueller Wert",
-          "lookup": 1
+          "lname": "Warmwassertemperatur Aktueller Wert"
         },
         "00-007": {
           "name": "Kesseltemperatur Istwert",
           "level": "117",
-          "lname": "Kesseltemperatur Kesseltemperatur Istwert",
-          "lookup": 1
+          "lname": "Kesseltemperatur Kesseltemperatur Istwert"
         },
         "01-001": {
           "name": "Sollwert",
@@ -729,8 +724,7 @@
         },
         "02-072": {
           "name": "Uhrzeit",
-          "level": "102",
-          "lookup": 1
+          "level": "102"
         },
         "03-001": {
           "name": "Fusspunkt",
@@ -785,8 +779,7 @@
         "03-050": {
           "name": "Betriebswahl",
           "level": "096",
-          "enum": "Betriebswahl",
-          "lookup": 1
+          "enum": "Betriebswahl"
         },
         "03-051": {
           "name": "Heizbetrieb",
@@ -1016,14 +1009,12 @@
         "00-004": {
           "name": "Aktueller Wert",
           "level": "114",
-          "lname": "Warmwassertemperatur Aktueller Wert",
-          "lookup": 1
+          "lname": "Warmwassertemperatur Aktueller Wert"
         },
         "00-007": {
           "name": "Kesseltemperatur Istwert",
           "level": "117",
-          "lname": "Kesseltemperatur Kesseltemperatur Istwert",
-          "lookup": 1
+          "lname": "Kesseltemperatur Kesseltemperatur Istwert"
         },
         "01-001": {
           "name": "Sollwert",
@@ -1075,8 +1066,7 @@
         },
         "02-072": {
           "name": "Uhrzeit",
-          "level": "102",
-          "lookup": 1
+          "level": "102"
         },
         "03-001": {
           "name": "Fusspunkt",
@@ -1131,8 +1121,7 @@
         "03-050": {
           "name": "Betriebswahl",
           "level": "096",
-          "enum": "Betriebswahl",
-          "lookup": 1
+          "enum": "Betriebswahl"
         },
         "03-051": {
           "name": "Heizbetrieb",
@@ -1715,6 +1704,593 @@
           "4": "Auto mit Zeitprogramm",
           "6": "",
           "7": ""
+        }
+      }
+    }
+  },
+  "default-struct": {
+    "type": "struct",
+    "fctType": {
+      "9": {
+        "10": {
+          "type": "state",
+          "common": {
+            "name": "Betriebsarten",
+            "type": "number",
+            "read": true,
+            "write": false,
+            "states": {
+              "0": "Ausgeschaltet",
+              "5": "Ein"
+            }
+          },
+          "native": {
+            "OID": "/2/59/0"
+          }
+        },
+        "11": {
+          "type": "state",
+          "common": {
+            "name": "Betriebswahl",
+            "type": "number",
+            "read": true,
+            "write": true,
+            "states": {
+              "0": "AUS",
+              "1": "EIN",
+              "2": "Handbetrieb",
+              "3": "Kaminkehrerbetrieb",
+              "4": "Aktorentest"
+            }
+          },
+          "native": {
+            "OID": "/9/75/0"
+          }
+        },
+        "15": {
+          "type": "state",
+          "common": {
+            "name": "Handbetrieb Solltemperatur",
+            "type": "number",
+            "read": true,
+            "write": true,
+            "unit": "°C",
+            "min": 60,
+            "max": 85
+          },
+          "native": {
+            "OID": "/9/20/0"
+          }
+        },
+        "16": {
+          "type": "state",
+          "common": {
+            "name": "Solltemperatur ext. Wärmeanforderung",
+            "type": "number",
+            "read": true,
+            "write": true,
+            "unit": "°C",
+            "min": 35,
+            "max": 85
+          },
+          "native": {
+            "OID": "/9/57/0"
+          }
+        },
+        "18": {
+          "type": "state",
+          "common": {
+            "name": "Kaminkehrerbetrieb Restlaufzeit",
+            "type": "string",
+            "read": true,
+            "write": false,
+            "unit": "min",
+            "min": "0",
+            "max": "65534"
+          },
+          "native": {
+            "OID": "/9/90/0"
+          }
+        },
+        "19": {
+          "type": "state",
+          "common": {
+            "name": "Kaminkehrerbetrieb Leistung",
+            "type": "number",
+            "read": true,
+            "write": true,
+            "unit": "%",
+            "min": 30,
+            "max": 100
+          },
+          "native": {
+            "OID": "/10/110/0"
+          }
+        },
+        "20": {
+          "type": "state",
+          "common": {
+            "name": "Abgastemperatur",
+            "type": "number",
+            "read": true,
+            "write": false,
+            "unit": "°C",
+            "min": -30,
+            "max": 500
+          },
+          "native": {
+            "OID": "/0/11/0"
+          }
+        },
+        "21": {
+          "type": "state",
+          "common": {
+            "name": "Kesseltemperatur Soll",
+            "type": "number",
+            "read": true,
+            "write": false,
+            "unit": "°C",
+            "min": 0,
+            "max": 100
+          },
+          "native": {
+            "OID": "/1/7/0"
+          }
+        },
+        "22": {
+          "type": "state",
+          "common": {
+            "name": "Kesseltemperatur Ist",
+            "type": "number",
+            "read": true,
+            "write": false,
+            "unit": "°C",
+            "min": -30,
+            "max": 150
+          },
+          "native": {
+            "OID": "/0/7/0"
+          }
+        },
+        "23": {
+          "type": "state",
+          "common": {
+            "name": "Brennkammertemperatur",
+            "type": "number",
+            "read": true,
+            "write": false,
+            "unit": "°C",
+            "min": -30,
+            "max": 1500
+          },
+          "native": {
+            "OID": "/0/45/0"
+          }
+        },
+        "24": {
+          "type": "state",
+          "common": {
+            "name": "Betriebsphase",
+            "type": "number",
+            "read": true,
+            "write": false,
+            "states": {
+              "3": "Standby"
+            }
+          },
+          "native": {
+            "OID": "/2/1/0"
+          }
+        },
+        "25": {
+          "type": "state",
+          "common": {
+            "name": "Hysterese Brenner EIN",
+            "type": "number",
+            "read": true,
+            "write": true,
+            "unit": "K",
+            "min": -20,
+            "max": 0
+          },
+          "native": {
+            "OID": "/9/21/0"
+          }
+        },
+        "26": {
+          "type": "state",
+          "common": {
+            "name": "Kesselleistung",
+            "type": "number",
+            "read": true,
+            "write": false,
+            "unit": "%",
+            "min": 0,
+            "max": 100
+          },
+          "native": {
+            "OID": "/0/9/0"
+          }
+        },
+        "30": {
+          "type": "state",
+          "common": {
+            "name": "Betriebsstunden",
+            "type": "string",
+            "read": true,
+            "write": true,
+            "unit": "h",
+            "min": "0",
+            "max": "65534"
+          },
+          "native": {
+            "OID": "/2/81/0"
+          }
+        },
+        "31": {
+          "type": "state",
+          "common": {
+            "name": "Anzahl der Brennerstarts",
+            "type": "string",
+            "read": true,
+            "write": true,
+            "min": "0",
+            "max": "65534"
+          },
+          "native": {
+            "OID": "/2/80/0"
+          }
+        },
+        "35": {
+          "type": "state",
+          "common": {
+            "name": "Pelletverbrauch",
+            "type": "number",
+            "read": true,
+            "write": true,
+            "unit": "t",
+            "min": 0,
+            "max": 655
+          },
+          "native": {
+            "OID": "/23/100/0"
+          }
+        },
+        "36": {
+          "type": "state",
+          "common": {
+            "name": "Gesamt Pelletverbrauch",
+            "type": "number",
+            "read": true,
+            "write": true,
+            "unit": "t",
+            "min": 0,
+            "max": 655
+          },
+          "native": {
+            "OID": "/23/103/0"
+          }
+        },
+        "37": {
+          "type": "state",
+          "common": {
+            "name": "Brennstoffmenge Förderschnecke Bereich",
+            "type": "number",
+            "read": true,
+            "write": true,
+            "unit": "kg",
+            "min": 8.7,
+            "max": 12
+          },
+          "native": {
+            "OID": "/12/100/0"
+          }
+        },
+        "38": {
+          "type": "state",
+          "common": {
+            "name": "Brennstoffmenge Förderschnecke Istwert",
+            "type": "number",
+            "read": true,
+            "write": true,
+            "unit": "kg",
+            "min": 6,
+            "max": 14
+          },
+          "native": {
+            "OID": "/12/101/0"
+          }
+        },
+        "39": {
+          "type": "state",
+          "common": {
+            "name": "Brennstoffmenge Förderschnecke Korrektur",
+            "type": "number",
+            "read": true,
+            "write": true,
+            "min": -5,
+            "max": 5
+          },
+          "native": {
+            "OID": "/12/104/0"
+          }
+        },
+        "50": {
+          "type": "state",
+          "common": {
+            "name": "Laufzeit bis Reinigung",
+            "type": "string",
+            "read": true,
+            "write": false,
+            "unit": "h",
+            "min": "0",
+            "max": "65534"
+          },
+          "native": {
+            "OID": "/20/61/0"
+          }
+        },
+        "51": {
+          "type": "state",
+          "common": {
+            "name": "Laufzeit bis Hauptreinigung",
+            "type": "string",
+            "read": true,
+            "write": false,
+            "unit": "h",
+            "min": "0",
+            "max": "65534"
+          },
+          "native": {
+            "OID": "/20/62/0"
+          }
+        },
+        "90": {
+          "type": "state",
+          "common": {
+            "name": "Softwareversion Feuerungsautomat",
+            "type": "string",
+            "read": true,
+            "write": false
+          },
+          "native": {
+            "OID": "/4/92/0"
+          }
+        },
+        "91": {
+          "type": "state",
+          "common": {
+            "name": "Version HW",
+            "type": "string",
+            "read": true,
+            "write": false
+          },
+          "native": {
+            "OID": "/4/93/0"
+          }
+        },
+        "92": {
+          "type": "state",
+          "common": {
+            "name": "Kesseltype",
+            "type": "string",
+            "read": true,
+            "write": false
+          },
+          "native": {
+            "OID": "/12/38/0"
+          }
+        },
+        "00": {
+          "type": "state",
+          "common": {
+            "name": "Alarmcode",
+            "type": "string",
+            "read": true,
+            "write": false,
+            "min": "0",
+            "max": "65534"
+          },
+          "native": {
+            "OID": "/2/0/0"
+          }
+        },
+        "01": {
+          "type": "state",
+          "common": {
+            "name": "Uhrzeit",
+            "type": "string",
+            "read": true,
+            "write": true,
+            "min": "00:00",
+            "max": "23:59"
+          },
+          "native": {
+            "OID": "/2/72/0"
+          }
+        }
+      },
+      "14": {
+        "10": {
+          "type": "state",
+          "common": {
+            "name": "Aktuelle Soll-Temperatur",
+            "type": "number",
+            "read": true,
+            "write": false,
+            "unit": "°C",
+            "min": 0,
+            "max": 50
+          },
+          "native": {
+            "OID": "/1/1/0"
+          }
+        },
+        "11": {
+          "type": "state",
+          "common": {
+            "name": "Aktuelle Vorlauf-Temparatur",
+            "type": "number",
+            "read": true,
+            "write": false,
+            "unit": "°C",
+            "min": 0,
+            "max": 0
+          },
+          "native": {
+            "OID": "/0/2/0"
+          }
+        },
+        "90": {
+          "type": "state",
+          "common": {
+            "name": "Softwareversion Feuerungsautomat",
+            "type": "string",
+            "read": true,
+            "write": false
+          },
+          "native": {
+            "OID": "/4/92/0"
+          }
+        },
+        "91": {
+          "type": "state",
+          "common": {
+            "name": "Version HW",
+            "type": "string",
+            "read": true,
+            "write": false
+          },
+          "native": {
+            "OID": "/4/93/0"
+          }
+        },
+        "00": {
+          "type": "state",
+          "common": {
+            "name": "Betriebswahl",
+            "type": "number",
+            "read": true,
+            "write": true,
+            "states": {
+              "0": "Standby",
+              "1": "Heizprogramm 1",
+              "2": "Heizprogramm 2",
+              "3": "Heizprogramm 3",
+              "4": "Heizbetrieb",
+              "5": "Absenkbetrieb"
+            }
+          },
+          "native": {
+            "OID": "/3/50/0"
+          }
+        },
+        "01": {
+          "type": "state",
+          "common": {
+            "name": "Urlaubsprogramm bis Datum",
+            "type": "string",
+            "read": true,
+            "write": false
+          },
+          "native": {}
+        },
+        "02": {
+          "type": "state",
+          "common": {
+            "name": "Soll-Temperatur Heizbetrieb",
+            "type": "number",
+            "read": true,
+            "write": true,
+            "unit": "°C",
+            "min": 10,
+            "max": 30
+          },
+          "native": {
+            "OID": "/3/51/0"
+          }
+        },
+        "03": {
+          "type": "state",
+          "common": {
+            "name": "Soll-Temperator Absenkbetrieb",
+            "type": "number",
+            "read": true,
+            "write": true,
+            "unit": "°C",
+            "min": 5,
+            "max": 20
+          },
+          "native": {
+            "OID": "/3/53/0"
+          }
+        },
+        "04": {
+          "type": "state",
+          "common": {
+            "name": "Soll-Temperatur Eco/Comfort",
+            "type": "string",
+            "read": true,
+            "write": false
+          },
+          "native": {}
+        },
+        "05": {
+          "type": "state",
+          "common": {
+            "name": "Dauer Eco/Comfort Betrieb",
+            "type": "string",
+            "read": true,
+            "write": false
+          },
+          "native": {}
+        }
+      },
+      "16": {
+        "01": {
+          "type": "state",
+          "common": {
+            "name": "Puffertemperatur Soll",
+            "type": "number",
+            "read": true,
+            "write": false,
+            "unit": "°C",
+            "min": 0,
+            "max": 0
+          },
+          "native": {
+            "OID": "/1/15/0"
+          }
+        },
+        "02": {
+          "type": "state",
+          "common": {
+            "name": "Puffertemperatur TPE",
+            "type": "number",
+            "read": true,
+            "write": false,
+            "unit": "°C",
+            "min": 0,
+            "max": 0
+          },
+          "native": {
+            "OID": "/21/65/0"
+          }
+        },
+        "03": {
+          "type": "state",
+          "common": {
+            "name": "Puffertemperatur TPA",
+            "type": "number",
+            "read": true,
+            "write": false,
+            "unit": "°C",
+            "min": 0,
+            "max": 0
+          },
+          "native": {
+            "OID": "/21/66/0"
+          }
         }
       }
     }

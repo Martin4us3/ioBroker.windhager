@@ -114,7 +114,8 @@
         "ip": "192.168.178.21",
         "login": "Service",
         "password": "my-password",
-        "updateInterval": 60
+        "updateInterval": 60,
+        "initStruct": null
     },
     "objects": [
         {
@@ -136,7 +137,7 @@
             }
         },
         {
-            "_id": "windhager.admin.windhager-config",
+            "_id": "system.adapter.windhager.state-config",
             "type": "state",
             "common": {
                 "name": "windhager-config",

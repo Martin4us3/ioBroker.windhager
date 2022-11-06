@@ -1,7 +1,8 @@
 //Windhager-Adapter - Copyright (c) by Martin Danne
 
 const InitializeStructConfig = {
-    cmd: 'none'
+    cmd: 'none',
+    delete: false
 };
 
 function load(settings, onChange) {
@@ -24,31 +25,44 @@ function load(settings, onChange) {
     });
 
     function setFileInfo ( file ) {
-        $('#fileInfo').html(`File type: ${file.type}   ${file.type === 'flat' ?
-                `${Object.keys(file.states).length} states` : `${Object.keys(file.fct).length} functions` }`);
+//        $('#fileImport').attr('disabled', !file ? 'disabled' : null);
+        $('#fileImport').prop('disabled', !file );
+        if(file)
+            $('#fileInfo').html(`File type: ${file.type}   ${file.type === 'flat' ?
+                   `${Object.keys(file.states).length} states` : `${Object.keys(file.fct).length} functions` }`);
+        else
+            $('#fileInfo').html('');
     }
-
+/*
     socket.emit('getState', `${adapter}.${instance}._initializeStructure`, function (err, res) {
         if(!err, res) {
-            const val = JSON.parse(res.val);
-            InitializeStructConfig.cmd              = val.cmd;
-            $(`input:radio[value=${val.cmd}]`).prop('checked', true);
-            InitializeStructConfig.file             = val.file;
-            $('#fileImport').attr('disabled', !val.file ? 'disabled' : null);
-            setFileInfo(val.file);
-            //            $('#fileInfo').html(`File type: ${val.file.type}   ${val.file.type === 'flat' ?
-//                  `${Object.keys(val.file.states).length} states` : `${Object.keys(val.file.fct).length} functions` }`);
-            InitializeStructConfig.deleteBefore = val.deleteBefore;
-            $('#deleteStruct').prop('checked', val.deleteBefore);
-        }
-    });
+*/
+    if(settings.initStruct) {
+        const val = settings.initStruct; //JSON.parse(res.val);
+        InitializeStructConfig.cmd          = val.cmd || 'none';
+        $(`input:radio[value=${InitializeStructConfig.cmd}]`).prop('checked', true);
+        if(val.obj)
+            InitializeStructConfig.obj;
+        setFileInfo(InitializeStructConfig.obj);
+        InitializeStructConfig.delete       = val.delete || false;
+        $('#deleteStruct').prop('checked', InitializeStructConfig.delete);
+    }
+//    });
 
     //import and export state model
     $('#btnExport').on('click', function() {
-        const generic = ( $('input[name=exportStruct]:checked').val() === 'struct' );
-        exportDeviceStructure( generic, (err, res) => {
+//        const generic = ( $('input[name=exportStruct]:checked').val() === 'struct' );
+        exportDeviceStructure( true, (err, res) => {
             if(!err && res) {
                 generateFile('windhager-structure.json', res);
+            }
+        });
+    });
+    $('#btnBackup').on('click', function() {
+//        const generic = ( $('input[name=exportStruct]:checked').val() === 'struct' );
+        exportDeviceStructure( false, (err, res) => {
+            if(!err && res) {
+                generateFile('windhager-state-backup.json', res);
             }
         });
     });
@@ -57,7 +71,7 @@ function load(settings, onChange) {
         onChange();
     });
     $('#deleteStruct').on('change', function () {
-        InitializeStructConfig.deleteBefore = $('#deleteStruct').prop('checked');
+        InitializeStructConfig.delete = $('#deleteStruct').prop('checked');
         onChange();
     });
     $('#btnImport').on('click', function() {
@@ -68,13 +82,11 @@ function load(settings, onChange) {
         input.addEventListener('change', function (e) {
             handleSelectImport(e, function (obj) {
                 if(obj.model && obj.model === 'windhager.adapter.export') {
-                    InitializeStructConfig.cmd = 'file';
-                    InitializeStructConfig.file = obj;
+                    InitializeStructConfig.cmd = 'import';
+                    InitializeStructConfig.obj = obj;
                     $('#fileImport').attr('disabled', null);
                     $('#fileImport').prop('checked', true);
                     setFileInfo(obj);
-//                    $('#fileInfo').html(`File type: ${obj.type}   ${obj.type === 'flat' ?
-//                            `${Object.keys(obj.states).length} states` : `${Object.keys(obj.fct).length} functions` }`);
                     onChange();
                 } else {
                     $('#fileInfo').html('unknown File format');
@@ -101,8 +113,10 @@ function save(callback) {
             obj[$this.attr('id')] = $this.val();
         }
     });
+    if(InitializeStructConfig.cmd !== 'import') delete InitializeStructConfig.obj;
+    obj.initStruct = InitializeStructConfig;
+//    socket.emit('setState', `${adapter}.${instance}._initializeStructureConfig`, {val: JSON.stringify(InitializeStructConfig), ack: false});
 
-    socket.emit('setState', `${adapter}.${instance}._initializeStructure`, {val: JSON.stringify(InitializeStructConfig), ack: false});
     callback(obj);
 }
 
