@@ -25,33 +25,29 @@ function load(settings, onChange) {
     });
 
     function setFileInfo ( file ) {
-//        $('#fileImport').attr('disabled', !file ? 'disabled' : null);
-        $('#fileImport').prop('disabled', !file );
+//        $('#fileImport').prop('disabled', !file );
         if(file)
             $('#fileInfo').html(`File type: ${file.type}   ${file.type === 'flat' ?
                    `${Object.keys(file.states).length} states` : `${Object.keys(file.fct).length} functions` }`);
         else
             $('#fileInfo').html('');
     }
-/*
-    socket.emit('getState', `${adapter}.${instance}._initializeStructure`, function (err, res) {
-        if(!err, res) {
-*/
+
     if(settings.initStruct) {
         const val = settings.initStruct; //JSON.parse(res.val);
         InitializeStructConfig.cmd          = val.cmd || 'none';
         $(`input:radio[value=${InitializeStructConfig.cmd}]`).prop('checked', true);
-        if(val.obj)
-            InitializeStructConfig.obj;
+        if(val.obj) {
+            InitializeStructConfig.obj = val.obj;
+            $('#fileImport').attr('disabled', null);
+        }
         setFileInfo(InitializeStructConfig.obj);
         InitializeStructConfig.delete       = val.delete || false;
         $('#deleteStruct').prop('checked', InitializeStructConfig.delete);
     }
-//    });
 
     //import and export state model
     $('#btnExport').on('click', function() {
-//        const generic = ( $('input[name=exportStruct]:checked').val() === 'struct' );
         exportDeviceStructure( true, (err, res) => {
             if(!err && res) {
                 generateFile('windhager-structure.json', res);
@@ -59,7 +55,6 @@ function load(settings, onChange) {
         });
     });
     $('#btnBackup').on('click', function() {
-//        const generic = ( $('input[name=exportStruct]:checked').val() === 'struct' );
         exportDeviceStructure( false, (err, res) => {
             if(!err && res) {
                 generateFile('windhager-state-backup.json', res);
@@ -84,8 +79,8 @@ function load(settings, onChange) {
                 if(obj.model && obj.model === 'windhager.adapter.export') {
                     InitializeStructConfig.cmd = 'import';
                     InitializeStructConfig.obj = obj;
-                    $('#fileImport').attr('disabled', null);
-                    $('#fileImport').prop('checked', true);
+                    $('#fileImport').attr('disabled', null)
+                                    .prop('checked', true);
                     setFileInfo(obj);
                     onChange();
                 } else {
@@ -115,7 +110,6 @@ function save(callback) {
     });
     if(InitializeStructConfig.cmd !== 'import') delete InitializeStructConfig.obj;
     obj.initStruct = InitializeStructConfig;
-//    socket.emit('setState', `${adapter}.${instance}._initializeStructureConfig`, {val: JSON.stringify(InitializeStructConfig), ack: false});
 
     callback(obj);
 }

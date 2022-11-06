@@ -662,7 +662,8 @@
         "00-002": {
           "name": "Aktueller Wert",
           "level": "116",
-          "lname": "Vorlauftemperatur Aktueller Wert"
+          "lname": "Vorlauftemperatur Aktueller Wert",
+          "maxValue": "80"
         },
         "00-004": {
           "name": "Aktueller Wert",
@@ -1561,7 +1562,8 @@
         "01-015": {
           "name": "Sollwert",
           "level": "104",
-          "lname": "Puffertemperaturen Sollwert"
+          "lname": "Puffertemperaturen Sollwert",
+          "maxValue": "80"
         },
         "01-022": {
           "name": "Pumpe Wärmeerzeuger",
@@ -1684,12 +1686,14 @@
         "21-065": {
           "name": "TPE",
           "level": "104",
-          "lname": "Puffertemperaturen TPE"
+          "lname": "Puffertemperaturen TPE",
+          "maxValue": "80"
         },
         "21-066": {
           "name": "TPA",
           "level": "104",
-          "lname": "Puffertemperaturen TPA"
+          "lname": "Puffertemperaturen TPA",
+          "maxValue": "80"
         },
         "22-075": {
           "name": "Unbekannter Parameter",

@@ -1,8 +1,11 @@
 {
     "common": {
         "name": "windhager",
-        "version": "0.11.0",
+        "version": "0.15.0",
         "news": {
+            "0.15.0": {
+                "en": "first public test version with import and export function"
+            },
             "0.10.0": {
                 "en": "revised to load and modify selected states"
             },
@@ -115,7 +118,7 @@
         "login": "Service",
         "password": "my-password",
         "updateInterval": 60,
-        "initStruct": null
+        "initStruct": { "cmd": "default", "delete":  false }
     },
     "objects": [
         {
