@@ -1,8 +1,10 @@
 /* eslint-disable no-inner-declarations */
 'use strict';
 
-const utils = require('@iobroker/adapter-core');
-const http  = require('urllib');
+const utils         = require('@iobroker/adapter-core');
+//const axios         = require('axios-digest');
+const http          = require('urllib');
+//const xmlConvert    = require('xml-js');
 
 function OId( oid ) {
     const k = oid.split('/');
@@ -24,6 +26,16 @@ class WindhagerDevice {
         this.authentification   = `${user}:${password}`;
     }
 
+    // http://192.168.110.145/res/xml/EbenenTexte_de.xml
+    // http://192.168.110.145/res/xml/VarIdentTexte_de.xml
+    // http://192.168.110.145/res/xml/AufzaehlTexte_de.xml
+    // http://192.168.110.145/res/xml/ErrorTexte_de.xml
+/*
+    apiURLPath = "/api/1.0/lookup" # return a realtime value (slow)
+    apiURLCachePath = "/api/1.0/datapoint" # return  a 30 sec cached value
+    apiURLFullCachePath = "/api/1.0/datapoints" # return every cached values
+*/
+
     datapointConfig( oId ) {
         const fct   = this.fct[oId.fctId];
         if (!fct)
@@ -39,10 +51,13 @@ class WindhagerDevice {
 
     async request(whFunc, options) {
         const connOptions = {
-            method: 'GET',
+            method:             'GET',
+            timeout:            10000,
+            timing:             true,
+  //          agent:              this.agent,
             rejectUnauthorized: false,
-            digestAuth: this.authentification,
-            dataType: 'json'
+            digestAuth:         this.authentification,
+            dataType:           'json'
         };
         if (options) Object.keys(options).forEach(id => {
             connOptions[id] = options[id];
@@ -55,11 +70,11 @@ class WindhagerDevice {
     }
 
     async init() {
-        this.httpClient                 = http.create();
+        this.httpClient = http.create();
         this.httpClient.agent.keepAlive = true;
-        this.subnetId                   = (await this.request('lookup'))[0];
 
-        const struct = await this.request('lookup/' + this.subnetId);
+        this.subnetId   = (await this.lookup())[0];
+        const struct    = await this.lookup('/' + this.subnetId);
         this.fct = struct.reduce( (fctObjs, device) => {
             device.functions.reduce( (fctObjs, fct) => {
                 if( fct.fctType >= 0 && this.config.function_type[fct.fctType] ) { // known function type
@@ -72,7 +87,28 @@ class WindhagerDevice {
             }, fctObjs );
             return fctObjs;
         }, {} );
-    }
+        // todo: read structure from Windhager resources
+        /*
+        const connOptions = {
+            method: 'GET',
+            rejectUnauthorized: false,
+            digestAuth: this.authentification,
+            dataType: 'text'
+        };
+        const {data, res} = await this.httpClient.request(`http://${this.ip}/res/xml/VarIdentTexte_de.xml`, connOptions );
+        const xmlData = xmlConvert.xml2js(data, { compact : true})
+        this.varIdentText = xmlData.VarIdentTexte.gn.reduce( (objs, o) => {
+            if(Array.isArray(o.mn)) {
+                objs[o._attributes.id] = o.mn.reduce( (text, t) => {
+                    text[t._attributes.id] = t._text;
+                    return text;
+                }, {} );
+            } else {
+                objs[o._attributes.id] = {[o.mn._attributes.id]: o.mn._text};
+            }
+            return objs;
+        }, {} );
+*/    }
 
     async putDatapoint( oId, val ) {
         const options = {
@@ -84,7 +120,11 @@ class WindhagerDevice {
     async getDatapoint( OId ) {
         return this.request('datapoint' + OId );
     }
-    async getDatapoints( ) {
+    async lookup( OId ) {
+        return this.request('lookup' + OId );
+    }
+    async getDatapoints() {
+        // get cached Datepoints
         return this.request('datapoints' );
     }
 }
@@ -383,20 +423,22 @@ class Windhager extends utils.Adapter {
     }
 
     async updateWindhagerData( ) {
-        try {
-            const start = Date.now(); let count = 0;
-            const dps = await this.windhager.getDatapoints();
-            dps.forEach( dp => {
+        const start = Date.now(); let count = 0;
+        const dps = Object.keys(this.cache.mapping);
+        for(let i = 0; i<dps.length; i++) {
+            try {
+                const dp = await this.windhager.lookup(dps[i]);
                 const id = this.cache.mapping[dp.OID];
                 if(id) {
                     this.setState(id, {val: this.windhager.config.type[dp.typeId] === 'number' ? Number(dp.value) : dp.value, ack: true});
                     count++;
                 }
-            });
-            this.log.debug(`update ${count} Windhager states in ${Date.now()-start} milliseconds`);
-        } catch ( error ) {
-            this.log.error(`error: ${error}`);
+            } catch (e) {
+                this.log.warn(`haven't got value for datapoint ${dps[i]}; error: ${e.message}`);
+            }
         }
+        this.log.debug(`update ${count} Windhager states in ${Date.now()-start} milliseconds` +
+            ((count < this.cache.mapping.length) ? `; ${this.cache.mapping.length - count} loosed` : ''));
     }
 
     async intervalUpdate() {

@@ -15,9 +15,12 @@
 2. Go to Adapters
 3. Click Githab icon "Install from custom URL"
 4. Change to CUSTOM tab.
-5. Enter https://github.com/rbrunka/ioBroker.windhager.git into URL or file path and click INSTALL.
+5. Enter https://github.com/Martin4us3/ioBroker.windhager into URL or file path and click INSTALL.
 
 ## Changelog
+
+### 0.15.0
+* (Martin4us3) very first alpha test version
 
 ### 0.10.0
 * (Martin4us3) revised to load and modify selected states

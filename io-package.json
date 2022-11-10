@@ -1,8 +1,11 @@
 {
     "common": {
         "name": "windhager",
-        "version": "0.15.0",
+        "version": "0.16.0",
         "news": {
+            "0.16.0": {
+                "en": "Read current data from the Windhager with lookup function"
+            },
             "0.15.0": {
                 "en": "first public test version with import and export function"
             },
