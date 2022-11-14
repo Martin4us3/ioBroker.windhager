@@ -120,8 +120,8 @@ class WindhagerDevice {
     async getDatapoint( OId ) {
         return this.request('datapoint' + OId );
     }
-    async lookup( OId ) {
-        return this.request('lookup' + OId );
+    async lookup( oId ) {
+        return this.request('lookup' + (oId || '') );
     }
     async getDatapoints() {
         // get cached Datepoints
