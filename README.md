@@ -17,6 +17,9 @@
 4. Change to CUSTOM tab.
 5. Enter https://github.com/Martin4us3/ioBroker.windhager into URL or file path and click INSTALL.
 
+### How to use structure
+
+
 ## Changelog
 
 ### 0.15.0
