@@ -2,9 +2,11 @@
 'use strict';
 
 const utils         = require('@iobroker/adapter-core');
-//const axios         = require('axios-digest');
-const http          = require('urllib');
-//const xmlConvert    = require('xml-js');
+//const http          = require('urllib');
+const axios         = require('axios').default;
+//const AxiosDigest   = require('axios-digest').default;
+const { AxiosDigest } = require('axios-digest-v2');
+const xmlConvert    = require('xml-js');
 
 function OId( oid ) {
     const k = oid.split('/');
@@ -22,8 +24,11 @@ function OId( oid ) {
 class WindhagerDevice {
     constructor( config, ip, user, password) {
         this.config             = config;
-        this.ip                 = ip;
-        this.authentification   = `${user}:${password}`;
+//        this.ip                 = ip;
+//        this.authentification   = `${user}:${password}`;
+        this.baseUrl        = 'http://' + ip + '/api/1.0/';
+        this.user           = user;
+        this.password       = password;
     }
 
     // http://192.168.110.145/res/xml/EbenenTexte_de.xml
@@ -49,12 +54,10 @@ class WindhagerDevice {
         return {fctConfig, dpConfig};
     }
 
-    async request(whFunc, options) {
+    async request(whFunc, options, baseURL) {
         const connOptions = {
             method:             'GET',
             timeout:            10000,
-            timing:             true,
-  //          agent:              this.agent,
             rejectUnauthorized: false,
             digestAuth:         this.authentification,
             dataType:           'json'
@@ -62,7 +65,7 @@ class WindhagerDevice {
         if (options) Object.keys(options).forEach(id => {
             connOptions[id] = options[id];
         });
-        const {data, res} = await this.httpClient.request(`http://${this.ip}/api/1.0/${whFunc}`, connOptions);
+        const {data, res} = await this.httpClient.request(`http://${this.ip}/${(baseURL || 'api/1.0')}/${whFunc}`, connOptions);
         if (res.statusCode !== 200) {
             new Error(res.statusMessage);
         }
@@ -70,12 +73,28 @@ class WindhagerDevice {
     }
 
     async init() {
-        this.httpClient = http.create();
-        this.httpClient.agent.keepAlive = true;
+//        this.httpClient = http.create();
+//        this.httpClient.agent.keepAlive = true;
 
-        this.subnetId   = (await this.lookup())[0];
-        const struct    = await this.lookup('/' + this.subnetId);
-        this.fct = struct.reduce( (fctObjs, device) => {
+        try {
+            const instance  = axios.create({
+                baseURL: this.baseUrl,
+                timeout: 5000,
+                headers: {'X-Custom-Header': 'foobar'}
+            });
+            this.axios      = new AxiosDigest(this.user, this.password);
+
+            const auth  = await this.axios.get(`${this.baseUrl}digest-auth/auth/${this.user}/${this.password}`);
+
+            const response  = await this.axios.get('lookup',{baseURL: this.baseUrl});
+            this.subnetId   = response [0];
+            const struct    = await this.axios.get( 'lookup/' + this.subnetId);
+        } catch (e) {
+            let a = e;
+        }
+//        this.subnetId   = (await this.lookup())[0];
+//        const struct    = await this.lookup('/' + this.subnetId);
+        this.fct        = struct.reduce( (fctObjs, device) => {
             device.functions.reduce( (fctObjs, fct) => {
                 if( fct.fctType >= 0 && this.config.function_type[fct.fctType] ) { // known function type
                     fctObjs[`${this.subnetId}.${device.nodeId}-${fct.fctId}`] = {
@@ -88,16 +107,12 @@ class WindhagerDevice {
             return fctObjs;
         }, {} );
         // todo: read structure from Windhager resources
-        /*
         const connOptions = {
-            method: 'GET',
-            rejectUnauthorized: false,
-            digestAuth: this.authentification,
             dataType: 'text'
         };
-        const {data, res} = await this.httpClient.request(`http://${this.ip}/res/xml/VarIdentTexte_de.xml`, connOptions );
-        const xmlData = xmlConvert.xml2js(data, { compact : true})
-        this.varIdentText = xmlData.VarIdentTexte.gn.reduce( (objs, o) => {
+        const data          = await this.request('VarIdentTexte_de.xml', connOptions,'res/xml');
+        const xmlData       = xmlConvert.xml2js(data, {compact : true})
+        this.varIdentText   = xmlData.VarIdentTexte.gn.reduce( (objs, o) => {
             if(Array.isArray(o.mn)) {
                 objs[o._attributes.id] = o.mn.reduce( (text, t) => {
                     text[t._attributes.id] = t._text;
@@ -108,7 +123,7 @@ class WindhagerDevice {
             }
             return objs;
         }, {} );
-*/    }
+    }
 
     async putDatapoint( oId, val ) {
         const options = {
@@ -117,11 +132,11 @@ class WindhagerDevice {
         };
         return this.request( 'datapoint', options );
     }
-    async getDatapoint( OId ) {
-        return this.request('datapoint' + OId );
+    async getDatapoint( oId ) {
+        return this.request('datapoint' + oId );
     }
-    async lookup( OId ) {
-        return this.request('lookup' + OId );
+    async lookup( oId ) {
+        return this.request('lookup' + (oId || '') );
     }
     async getDatapoints() {
         // get cached Datepoints
@@ -522,7 +537,7 @@ class Windhager extends utils.Adapter {
         try {
             callback();
         } catch (e) {
-            callback();
+//            callback();
         }
     }
 
