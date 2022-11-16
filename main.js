@@ -5,7 +5,8 @@ const utils         = require('@iobroker/adapter-core');
 //const http          = require('urllib');
 const axios         = require('axios').default;
 //const AxiosDigest   = require('axios-digest').default;
-const { AxiosDigest } = require('axios-digest-v2');
+
+//const { AxiosDigest } = require('axios-digest-v2');
 const xmlConvert    = require('xml-js');
 
 function OId( oid ) {
@@ -77,16 +78,29 @@ class WindhagerDevice {
 //        this.httpClient.agent.keepAlive = true;
 
         try {
-            const instance  = axios.create({
+            const AxiosDigestAuth = require('@mhoc/axios-digest-auth').default;
+
+            const digestAuth = new AxiosDigestAuth({
+                username: this.user,
+                password: this.password,
+            });
+//            const MakeARequest = async () => {
+                const response = await digestAuth.request({
+                    headers: { Accept: "application/json" },
+                    method: "GET",
+                    url: `${this.baseUrl}lookup`
+                });
+//            }
+/*            const instance  = axios.create({
                 baseURL: this.baseUrl,
                 timeout: 5000,
                 headers: {'X-Custom-Header': 'foobar'}
             });
             this.axios      = new AxiosDigest(this.user, this.password);
 
-            const auth  = await this.axios.get(`${this.baseUrl}digest-auth/auth/${this.user}/${this.password}`);
-
-            const response  = await this.axios.get('lookup',{baseURL: this.baseUrl});
+//            const auth  = await this.axios.get(`${this.baseUrl}digest-auth/auth/${this.user}/${this.password}`);
+*/
+//            const response  = await this.axios.get('lookup',{baseURL: this.baseUrl});
             this.subnetId   = response [0];
             const struct    = await this.axios.get( 'lookup/' + this.subnetId);
         } catch (e) {
