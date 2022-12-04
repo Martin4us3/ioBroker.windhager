@@ -1,10 +1,10 @@
 {
     "common": {
         "name": "windhager",
-        "version": "0.17.0",
+        "version": "0.18.0",
         "news": {
             "0.17.0": {
-                "en": "repair warite function"
+                "en": "repair write function"
             },
             "0.16.0": {
                 "en": "Read current data from the Windhager with lookup function"
