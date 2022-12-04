@@ -94,24 +94,6 @@
         "type": "climate-control",
         "compact": true,
         "materialize": true,
-        "materializeTab": true,
-        "adminTab": {
-            "singleton": true,
-            "name": {
-                "en": "ioBroker Windhager API Adapter",
-                "de": "ioBroker Windhager API Adapter",
-                "ru": "ioBroker Windhager API Adapter",
-                "pt": "ioBroker Windhager API Adapter",
-                "nl": "ioBroker Windhager API Adapter",
-                "fr": "ioBroker Windhager API Adapter",
-                "it": "ioBroker Windhager API Adapter",
-                "es": "ioBroker Windhager API Adapter",
-                "pl": "ioBroker Windhager API Adapter",
-                "zh-cn": "ioBroker Windhager API Adapter"
-            },
-            "link": "",
-            "fa-icon": "info"
-        },
         "supportCustoms": true,
         "dependencies": [
             {
@@ -124,7 +106,9 @@
         "login": "Service",
         "password": "my-password",
         "updateInterval": 60,
-        "initStruct": { "cmd": "default", "delete":  false }
+        "fullScan": false,
+        "initStruct": "default",
+        "deleteStruct":  false
     },
     "objects": [
         {
@@ -160,6 +144,14 @@
         }
     ],
     "instanceObjects": [
+        {
+            "_id": "",
+            "type": "meta",
+            "common": {
+                "name": "Windhager"
+            },
+            "native": {}
+        },
         {
             "_id": "trigger_update",
             "type": "state",
