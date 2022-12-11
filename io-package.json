@@ -163,6 +163,26 @@
                 "write": true
             },
             "native": {}
+        },
+        {
+            "_id": "trigger_export",
+            "type": "state",
+            "common": {
+                "name": "Manually trigger export",
+                "type": "number",
+                "expert": true,
+                "read": false,
+                "write": true,
+                "states": {
+                    "0": "done",
+                    "1": "KnownDps",
+                    "2": "FctTypeFromKnownDps",
+                    "3": "KnownFctTypes",
+                    "4": "StateStructure",
+                    "5": "BackupStructure"
+                }
+            },
+            "native": {}
         }
     ]
 }

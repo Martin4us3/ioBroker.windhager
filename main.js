@@ -2,7 +2,7 @@
 'use strict';
 
 const utils                     = require('@iobroker/adapter-core');
-const {OId, WindhagerDevice }   = require('./lib/windhager');
+const {OId, WindhagerDevice}    = require('./lib/windhager');
 const config                    = require('./lib/windhager-config.json');
 
 class Windhager extends utils.Adapter {
@@ -62,10 +62,6 @@ class Windhager extends utils.Adapter {
         if ( unit ) common.unit = unit;
 
 // validation
-        function cast(val) {
-            return common.type === 'number' ? Number(val) : val;
-        }
-
         const min = iCommon.min || dpInfo.minValue;
         if( min ) common.min = min;
         const max = iCommon.max || dpInfo.maxValue;
@@ -89,10 +85,19 @@ class Windhager extends utils.Adapter {
         };
     }
 
-    async deleteAllStates() {
+    async getAllSubnetObjectRows() {
         const r = this.namespace + '.' + this.windhager.subnet;
         const params = {startkey: r, endkey: r + '.\u9999'};
-        const o = await this.getObjectViewAsync('windhager', 'subnetObjects', params);
+        return this.getObjectViewAsync('windhager', 'subnetObjects', params);
+    }
+
+    async getAllSubnetStateRows() {
+        return this.getObjectViewAsync('windhager', 'subnetStates', {startkey: '', endkey: '\u9999'});
+    }
+
+    async deleteAllStates() {
+        this.mapping = {};
+        const o = await this.getAllSubnetObjectRows();
         const allObjects = o.rows.reduce((result, row) => {
             result[row.id] = row.value;
             return result;
@@ -100,10 +105,9 @@ class Windhager extends utils.Adapter {
         await Promise.all(
             Object.keys(allObjects).map(id => this.delObjectAsync(id))
         );
-        this.mapping = {};
     }
 
-    validateStateValue(id, state, obj) {
+    validateStateValue(obj, state) {
         const c = obj.common;
         let valErr = undefined;
 
@@ -115,16 +119,17 @@ class Windhager extends utils.Adapter {
         return valErr;
     }
 
-    async writeWindhagerState(id, state) {
-        const obj = await this.getObjectAsync(id);
-        const err = this.validateStateValue(id, state, obj);
+    async writeWindhagerState(obj, state) {
+        const err = this.validateStateValue(obj, state);
         if (err) {
             throw `state cannot set: ${err}`;
         } else {
             await this.windhager.putDatapoint(obj.native.OID, state.val);
-            this.setState(id, {val: state.val, ack: true});
+            this.setState(obj._id, {val: state.val, ack: true});
         }
     }
+
+//-- import-functions--------------------------------------------------------------------------------------------------
 
     async importDeviceStructure(imp, deleteBefore = false) {
         await this.windhager.initStructureInfo();
@@ -197,8 +202,8 @@ class Windhager extends utils.Adapter {
                 throw new Error(`unknown import type ${imp.type}`);
             }
 
-            Object.entries(objs).forEach(([id, obj]) => {
-                this.setObjectNotExistsAsync(id, obj);
+            await Object.entries(objs).forEach( async ([id, obj]) => {
+                await this.setObjectNotExistsAsync(id, obj);
             });
             this.log.info(`${Object.keys(objs).length} states created`);
         } catch (e) {
@@ -265,54 +270,157 @@ class Windhager extends utils.Adapter {
         this.log.info(`${Object.keys(ordered).length} states created`);
     }
 
+//-- export-functions--------------------------------------------------------------------------------------------------
+
+    getKnownDpsExport() {
+        if(this.windhager.knownDPs) {
+            return this.windhager.knownDPs;
+        } else {
+            return { msg: 'no scan result available - please start fullScan before' };
+        }
+    }
+
+    getFctTypeFromKnownDpsExport() {
+        if(this.windhager.knownDPs) {
+            const exp = Object.values(this.windhager.knownDPs).reduce( (exp, dp) => {
+                const oid = OId(dp.OID);
+                const fctType = this.windhager.fct[oid.fctId].fctType;
+                if(!exp[fctType]) exp[fctType] = {};
+
+                const eDp = Object.assign({}, dp);
+                delete eDp.OID;
+
+                if(exp[fctType][eDp.name]) {
+                    if(JSON.stringify(exp[fctType][eDp.name]) !== JSON.stringify(eDp)) {
+                        this.log.warn(`different datapoint ${eDp.name} in fctType ${fctType}`);
+                        if(!exp.diff)                        exp.diff = {};
+                        if(!exp.diff[fctType])               exp.diff[fctType] = {};
+                        if(!exp.diff[fctType][eDp.name])     exp.diff[fctType][eDp.name] = [];
+
+                        exp.diff[fctType][eDp.name][0] = exp[fctType][eDp.name];
+                        exp.diff[fctType][eDp.name].push(eDp);
+                    }
+                } else {
+                    exp[fctType][eDp.name] = eDp;
+                }
+                return exp;
+            }, {});
+
+            function sort(fct) {
+                return Object.keys(fct).sort().reduce(
+                    (obj, key) => { obj[key] = fct[key]; return obj; }, {}
+                );
+            }
+            Object.keys(exp).forEach(fctType => {
+                if(fctType !== 'diff')
+                    exp[fctType] = sort(exp[fctType]);
+            });
+            return exp;
+        } else {
+            return { msg: 'no scan result available - please start fullScan before' };
+        }
+    }
+
+    getKnownFctTypeExport() {
+        return this.windhager.config.knownFctType;
+    }
+
+    async getStateStructureExport() {
+        const res = await this.getAllSubnetObjectRows();
+        const firstFct = {};
+        const objs = res.rows.reduce((result, {id, value}) => {
+            try {
+                const [match, subnet, fct, sId] = id.match(new RegExp(`^${this.namespace}\\.(\\d+)\\.?(\\d\\d-\\d)?\\.?(.+)?`, ''));
+                if (match && (fct !== undefined)) {
+                    const fctObj = {
+                        type:   value.type,
+                        common: value.common,
+                        native: value.native
+                    };
+                    if (!result.subnet) result.subnet = subnet;
+                    if (value.type === 'device') {
+                        const fctType = fctObj.native.fctType;
+                        result.fct[fct] = fctObj;
+                        if (!firstFct[fctType]) {
+                            firstFct[fctType] = fct;
+                            result.fctType[fctType] = {};
+                        }
+                    } else {
+                        const fctType = result.fct[fct].native.fctType;
+                        if (firstFct[fctType] === fct) {                    // only states of first founded function
+                            if (fctObj.native && fctObj.native.OID) {       // prepare OID
+                                const [oMatch, oSubnet, oFct, oId] = fctObj.native.OID.match(/^\/(\d+)\/(\d+\/\d+)(.+)/, ``);
+                                fctObj.native.OID = oId;
+                            }
+                            result.fctType[fctType][sId] = fctObj;
+                        }
+                    }
+                }
+            } catch (e) {
+                this.log.warn(`export error: ${e.message}`);
+            }
+            return result;
+        }, {model: "windhager.adapter.export", type: "struct", subnet: null, fct: {}, fctType: {}});
+        return objs;
+    }
+
+    async getBackupStructureExport() {
+        const res = await this.getAllSubnetObjectRows();
+        const objs = {
+            model: "windhager.adapter.export",
+            type: "flat",
+            states: res.rows.reduce((result, {id, value}) => {
+                try {
+                    const [match, sId] = id.match(new RegExp(`^${this.namespace}\\.(.+)`, '')); // `^windhager\.\d+\.((\d+)\.(\d+-\d+)\..+)`
+                    if (match) {
+                        result[sId] = {
+                            type: value.type,
+                            common: value.common,
+                            native: value.native
+                        };
+                    } else {
+                        throw new Error('wrong id structure');
+                    }
+                } catch (e) {
+                    this.log.warn(`export error: ${e.message}`);
+                }
+                return result;
+            }, {})
+        }
+        return objs;
+    }
+
     async export( exportType ) {
         await this.setObjectNotExistsAsync('export', {
             type: 'state',
             common: {
                 name: 'export',
                 type: 'json',
-                role: 'config'
+                role: 'config',
+                expert: true
             },
             native: {}
         });
-        const exp = Object.values(this.windhager.getAllKnownDps()).reduce( (exp, dp) => {
-            const oid = OId(dp.OID);
-            const fctType = this.windhager.fct[oid.fctId].fctType;
-            if(!exp[fctType]) exp[fctType] = {};
+        const functions = {
+            "1": "getKnownDpsExport",
+            "2": "getFctTypeFromKnownDpsExport",
+            "3": "getKnownFctTypeExport",
+        };
+        const asyncFunctions = {
+            "4": "getStateStructureExport",
+            "5": "getBackupStructureExport"
+        };
 
-            const eDp = Object.assign({}, dp);
-            delete eDp.OID;
-
-            if(exp[fctType][eDp.name]) {
-                if(JSON.stringify(exp[fctType][eDp.name]) !== JSON.stringify(eDp)) {
-                    this.log.warn(`different datapoint ${eDp.name} in fctType ${fctType}`);
-                    if(!exp.diff)                        exp.diff = {};
-                    if(!exp.diff[fctType])               exp.diff[fctType] = {};
-                    if(!exp.diff[fctType][eDp.name])     exp.diff[fctType][eDp.name] = [];
-
-                    exp.diff[fctType][eDp.name][0] = exp[fctType][eDp.name];
-                    exp.diff[fctType][eDp.name].push(eDp);
-                }
-            } else {
-                exp[fctType][eDp.name] = eDp;
-            }
-            return exp;
-        }, {});
-
-        function sort(fct) {
-            return Object.keys(fct).sort().reduce(
-                (obj, key) => { obj[key] = fct[key]; return obj; }, {}
-            );
-        }
-        Object.keys(exp).forEach(fctType => {
-            if(fctType !== 'diff')
-                exp[fctType] = sort(exp[fctType]);
-        });
-        await this.setState('export', {val: JSON.stringify(exp), ack: true})
+        const   exp  = functions[exportType] ? this[functions[exportType]]() :
+                                    (asyncFunctions[exportType] ? await this[asyncFunctions[exportType]]() : undefined);
+        if(exp)
+            await this.setState('export', {val: JSON.stringify(exp), ack: true})
+        else
+            this.log.error('cannot find export type');
     }
 
     async readMapping() {
-        const allStates = await this.getObjectViewAsync('windhager', 'subnetStates', {startkey: '', endkey: '\u9999'});
+        const allStates = await this.getAllSubnetStateRows();
         this.mapping = allStates.rows.reduce((result, row) => {
             if (row.value.native && row.value.native.OID) {
                 result[row.value.native.OID] = row.id.substring(this.namespace.length + 1, row.id.length);
@@ -331,7 +439,7 @@ class Windhager extends utils.Adapter {
                 const id = this.mapping[dp.OID];
                 if (id) {
                     this.setState(id, {
-                        val: this.windhager.config.dataType[dp.typeId] === 'number' ? Number(dp.value) : dp.value,
+                        val: this.windhager.getDpTypeInfo(dp).dataType === 'number' ? Number(dp.value) : dp.value,
                         ack: true
                     });
                     count++;
@@ -345,8 +453,6 @@ class Windhager extends utils.Adapter {
     }
 
     async intervalUpdate() {
-        this.log.info('interval update');
-
         await this.updateWindhagerData();
         this.timeout = setTimeout(() => {
             this.intervalUpdate();
@@ -432,22 +538,15 @@ class Windhager extends utils.Adapter {
 
         this.log.debug('back to on ready');
         this.subscribeStates('*');
-/*
+        this.subscribeObjects('*');
+
         // reset init config after restart
-        await this.extendForeignObjectAsync(`system.adapter.${this.namespace}`, {
-            native: {
+        await this.updateConfig( {
                 fullScan:       false,
                 deleteStruct:   false,
                 initStruct:     'none',
                 importFile:     null
-            }
-        });
- */
-        this.config.fullScan        = false;
-        this.config.deleteStruct    = false;
-        this.config.initStruct      = 'none';
-        delete this.config.importFile;
-
+            } );
         this.log.debug('onReady end');
     }
 
@@ -459,37 +558,72 @@ class Windhager extends utils.Adapter {
         }
     }
 
+    getLocalId( fId ) {
+        const m = fId.match(new RegExp(`^${this.namespace}.(...+)`, '')); //     /^windhager.0.(...+)/);
+        return m ? m[1] : undefined;
+    }
+
+    mappingGetOid( sId ) {
+        const e = Object.entries(this.mapping).find(([oId, mId]) => (mId === sId));
+        if (e) return e[0];
+    }
+
+    mappingGetSid( oId ) {
+        return this.mapping[ oId ];
+    }
+
     async onObjectChange(id, obj) {
-        if (obj) {
-            this.log.info(`object ${id} changed: ${JSON.stringify(obj)}`);
-        } else {
-            this.log.info(`object ${id} deleted`);
+        const lId = this.getLocalId(id);
+        if(lId) {
+            const oId = this.mappingGetOid(lId);
+            if( !obj ) {
+                if( oId ) delete this.mapping[oId];
+            } else if(obj.from !== 'system.adapter.windhager.0' && obj.type === 'state') {
+                let mappingChanged = true;
+                if (obj.native && obj.native.OID) {
+                    if (oId && obj.native.OID === oId) {
+                        mappingChanged = false;
+                    } else {
+                        const oOidStateId = this.mapping[obj.native.OID];
+                        if (oOidStateId) {
+                            const oOidState = await this.getObjectAsync(oOidStateId);
+                            if (oOidState && oOidState.native && oOidState.native.OID) {
+                                delete oOidState.native.OID;
+                                await this.setObjectAsync(oOidStateId, oOidState);
+                                await this.setState(oOidStateId, {val: null, ack: true});
+                            }
+                        }
+                        this.mapping[obj.native.OID] = lId;
+                    }
+                } else {
+                    if (!oId) mappingChanged = false;
+                }
+                if (mappingChanged) {
+                    if (oId) delete this.mapping[oId];
+                    await this.setState(lId, {val: null, ack: true});
+                }
+            }
         }
-        const objs = Object.entries(this.mapping).filter( ( [oId, sId] ) => (sId = id) );
-        //        if (state && !state.ack) {
     }
 
     async onStateChange(id, state) {
         if (state && !state.ack) {
             try {
                 const k = id.split('.');
-
-                const obj   = await this.getObjectAsync(id);
-                let   o;
-                if(obj && obj.native && obj.native.OID) {
-                    o = OId(obj.native.OID);
-                }
-
                 if (k[2] == this.windhager.subnet) {
-                    await this.writeWindhagerState(id, state);
-                    this.setState(id, {val: state.val, ack: true});
+                    const obj = await this.getObjectAsync(id);
+                    if(obj && obj.native && obj.native.OID) {
+                        await this.writeWindhagerState(obj, state);
+                        this.setState(id, {val: state.val, ack: true});
+                    }
                 } else if (k[2] === 'trigger_update') {
                     this.log.info('manually trigger update');
                     await this.updateWindhagerData();
                 } else if (k[2] === 'trigger_export') {
                     this.log.info('trigger export');
-                    await this.export(state.val);
-                    this.setState(id, {val: 'done', ack: true});
+                    if(state.val !== 0)
+                        await this.export(state.val);
+                    this.setState(id, {val: 0, ack: true}); // done
                 }
             } catch (error) {
                 this.log.error(`Error ${error}`);

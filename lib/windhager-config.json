@@ -1,19 +1,4 @@
 {
-  "dataType": {
-    "0": "number",
-    "1": "number",
-    "2": "number",
-    "3": "number",
-    "4": "string",
-    "9": "number",
-    "13": "number",
-    "14": "number",
-    "15": "number",
-    "16": "number",
-    "17": "number",
-    "29": "string",
-    "30": "string"
-  },
   "knownFctType": {
     "9": {
       "00-007": {
