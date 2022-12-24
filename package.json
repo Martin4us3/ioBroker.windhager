@@ -1,6 +1,6 @@
 {
   "name": "iobroker.windhager",
-  "version": "0.18.0",
+  "version": "0.20.0",
   "description": "Adapter for Windhager API",
   "author": {
     "name": "Martin Danne",

@@ -120,7 +120,7 @@ class Windhager extends utils.Adapter {
     }
 
     async writeWindhagerState(obj, state) {
-        const err = this.validateStateValue(obj, state);
+        const err = false; //this.validateStateValue(obj, state);
         if (err) {
             throw `state cannot set: ${err}`;
         } else {
@@ -391,10 +391,10 @@ class Windhager extends utils.Adapter {
     }
 
     async export( exportType ) {
-        await this.setObjectNotExistsAsync('export', {
+        await this.setObjectNotExistsAsync('info.export_data', {
             type: 'state',
             common: {
-                name: 'export',
+                name: 'export_data',
                 type: 'json',
                 role: 'config',
                 expert: true
@@ -414,7 +414,7 @@ class Windhager extends utils.Adapter {
         const   exp  = functions[exportType] ? this[functions[exportType]]() :
                                     (asyncFunctions[exportType] ? await this[asyncFunctions[exportType]]() : undefined);
         if(exp)
-            await this.setState('export', {val: JSON.stringify(exp), ack: true})
+            await this.setState('info.export_data', {val: JSON.stringify(exp), ack: true})
         else
             this.log.error('cannot find export type');
     }
@@ -430,6 +430,41 @@ class Windhager extends utils.Adapter {
     }
 
     async updateWindhagerData() {
+        this.status = 'update';
+        const start = Date.now();
+        let count = {
+            use:    0,
+            notUse: 0
+        };
+        try {
+            const dps = await this.windhager.getDatapoints();
+            for(let i in dps) {
+                const dp = dps[i];
+                const id = this.mapping[dp.OID];
+                if(id) {
+                    this.setState(id, {
+                        val: this.windhager.getDpTypeInfo(dp).dataType === 'number' ? Number(dp.value) : dp.value,
+                        ack: true
+                    });
+                    count.use++;
+                    this.extendObjectAsync(id, {
+                        native: {
+                            DP_TIME: dp.timestamp
+                        }
+                    })
+                } else {
+                    count.notUse++;
+                }
+            }
+        } catch (e) {
+            this.log.warn(`error during update request ${e.message}`);
+        }
+        this.log.debug(`update ${count.use} Windhager states in ${Date.now() - start} milliseconds; ${count.notUse} states not used`);
+        this.status = 'sleep';
+    }
+
+    async lookupWindhagerData() {
+        this.status = 'lookup';
         const start = Date.now();
         let count = 0;
         const dps = Object.keys(this.mapping);
@@ -437,23 +472,32 @@ class Windhager extends utils.Adapter {
             try {
                 const dp = await this.windhager.lookup(dps[i]);
                 const id = this.mapping[dp.OID];
+                this.log.debug(`read datapoint ${dp.OID} to state ${id ? id : 'no state found'}`);
                 if (id) {
                     this.setState(id, {
                         val: this.windhager.getDpTypeInfo(dp).dataType === 'number' ? Number(dp.value) : dp.value,
                         ack: true
                     });
+                    this.extendObjectAsync(id, {
+                        native: {
+                            DP_TIME: dp.timestamp
+                        }
+                    })
                     count++;
                 }
             } catch (e) {
                 this.log.warn(`haven't got value for datapoint ${dps[i]}; error: ${e.message}`);
             }
         }
-        this.log.debug(`update ${count} Windhager states in ${Date.now() - start} milliseconds` +
+        this.log.debug(`lookup ${count} Windhager states in ${Date.now() - start} milliseconds` +
             ((count < this.mapping.length) ? `; ${this.mapping.length - count} loosed` : ''));
+        this.status = 'sleep';
     }
 
     async intervalUpdate() {
-        await this.updateWindhagerData();
+        if(this.status !== 'lookup') {
+            await this.updateWindhagerData();
+        }
         this.timeout = setTimeout(() => {
             this.intervalUpdate();
         }, this.updateInterval);
@@ -461,13 +505,15 @@ class Windhager extends utils.Adapter {
 
     async startWindhager(connectTries = 1) {
         try {
-            this.log.debug('try to connect to Windhager...');
+            this.log.debug('connect to Windhager...');
 
             this.windhager = new WindhagerDevice(await this.getWindhagerConfig(), this.log, this.config.ip);
-
             const subnet = await this.windhager.logIn(this.config.login, this.config.password);
-            await this.setStateAsync('info.connection', { ack: true, val: true });
+
+            this.setStateAsync('info.connection', { ack: true, val: true });
             this.log.info('Windhager connected');
+
+            this.parallel = 1;
 
             // are there knowDPs of previous scan
             var cfgObj = await this.getForeignObjectAsync( this.namespace );
@@ -476,6 +522,7 @@ class Windhager extends utils.Adapter {
                 this.log.debug('known datapoints of previous system scan found');
             }
 
+            this.status = 'initialize';
             await this.windhager.init( this.config.fullScan );
             if( this.config.fullScan ) {
                 await this.extendForeignObjectAsync(this.namespace, {
@@ -532,7 +579,18 @@ class Windhager extends utils.Adapter {
         }
     }
 
+    get status() {
+        return this._status;
+    }
+
+    set status( status ) {
+        this._status = status;
+        this.setStateAsync('info.status', { ack: true, val: status });
+    }
+
     async onReady() {
+        this.status = 'start adapter';
+
         this.updateInterval = this.config.updateInterval * 1000;   // update interval
         await this.startWindhager();
 
@@ -610,20 +668,27 @@ class Windhager extends utils.Adapter {
         if (state && !state.ack) {
             try {
                 const k = id.split('.');
+                if(k[2] === 'info') {
+                    switch(k[3]) {
+                        case 'lookup':
+                            this.log.info('lookup all current Windhager data');
+                            if(this.status !== 'lookup')
+                                await this.lookupWindhagerData();
+                            break;
+                        case 'export':
+                            this.log.info('trigger export');
+                            if(state.val !== 0)
+                                await this.export(state.val);
+                            this.setState(id, {val: 0, ack: true}); // done
+                            break;
+                    }
+                } else
                 if (k[2] == this.windhager.subnet) {
                     const obj = await this.getObjectAsync(id);
                     if(obj && obj.native && obj.native.OID) {
                         await this.writeWindhagerState(obj, state);
                         this.setState(id, {val: state.val, ack: true});
                     }
-                } else if (k[2] === 'trigger_update') {
-                    this.log.info('manually trigger update');
-                    await this.updateWindhagerData();
-                } else if (k[2] === 'trigger_export') {
-                    this.log.info('trigger export');
-                    if(state.val !== 0)
-                        await this.export(state.val);
-                    this.setState(id, {val: 0, ack: true}); // done
                 }
             } catch (error) {
                 this.log.error(`Error ${error}`);

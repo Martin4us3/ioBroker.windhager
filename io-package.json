@@ -1,8 +1,11 @@
 {
     "common": {
         "name": "windhager",
-        "version": "0.18.0",
+        "version": "0.20.0",
         "news": {
+            "0.20.0": {
+                "en": "first production of mine"
+            },
             "0.17.0": {
                 "en": "repair write function"
             },
@@ -153,10 +156,43 @@
             "native": {}
         },
         {
-            "_id": "trigger_update",
+            "_id": "info",
+            "type": "folder",
+            "common": {
+                "name": "info"
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.connection",
             "type": "state",
             "common": {
-                "name": "Manually trigger an update",
+                "name": "connection",
+                "role": "indicator.connected",
+                "type": "boolean",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.status",
+            "type": "state",
+            "common": {
+                "name": "status",
+                "role": "state",
+                "type": "string",
+                "read": true,
+                "write": false
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.lookup",
+            "type": "state",
+            "common": {
+                "name": "Manually trigger lookup data-points",
                 "type": "boolean",
                 "role": "button",
                 "read": false,
@@ -165,7 +201,7 @@
             "native": {}
         },
         {
-            "_id": "trigger_export",
+            "_id": "info.export",
             "type": "state",
             "common": {
                 "name": "Manually trigger export",
