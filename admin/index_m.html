@@ -43,7 +43,7 @@
                         <div class="row" style="margin: 0">
                             <div class="col s12 m6 l3">
                                 <div class="input-field">
-                                    <input class="value" id="ip" type="text">
+                                    <input class="value config" id="ip" type="text">
                                         <label for="ip">IP</label>
                                         <span class="translate">IP address of Windhager BioWIN2 Touch</span>
                                     </input>
@@ -51,7 +51,7 @@
                             </div>
                             <div class="col s12 m6 l3">
                                 <div class="input-field">
-                                    <input type="text" class="value" id="login">
+                                    <input type="text" class="value config" id="login">
                                         <label for="login" class="translate">Login</label>
                                         <span class="translate">Default login is Service</span>
                                     </input>
@@ -59,7 +59,7 @@
                             </div>
                             <div class="col s12 m6 l3">
                                 <div class="input-field">
-                                    <input id="password" type="text" class="value">
+                                    <input id="password" type="text" class="value config">
                                         <label for="password" data-error="wrong" data-success="right">Password</label>
                                         <span class="translate">Password</span>
                                     </input>
@@ -67,7 +67,7 @@
                             </div>
                             <div class="col s12 m6 l3">
                                 <div class="input-field">
-                                    <input class="value" id="updateInterval" type="text">
+                                    <input class="value config" id="updateInterval" type="text">
                                         <label for="updateInterval">Update Interval</label>
                                         <span class="translate">for updating Windhager data (in seconds)</span>
                                     </input>
@@ -100,7 +100,7 @@
                                                 <span id="fileInfo" style="margin-left: 8px"></span>
                                             </div>
                                             <div class="row input-field">
-                                                <input type="checkbox" class="value" id="deleteStruct" />
+                                                <input type="checkbox" class="value reInit" id="deleteStruct" />
                                                 <label for="deleteStruct" class="translate">Delete current structure before initializing</label>
                                             </div>
                                         </form>
@@ -117,7 +117,7 @@
                             <div class="col s12 m6 l6">
                                 <span class="translate">System Scan</span>
                                 <div class="row input-field">
-                                    <input type="checkbox" class="value" id="fullScan" />
+                                    <input type="checkbox" class="value reInit" id="fullScan" />
                                     <label for="fullScan" class="translate">Full Windhager scan with next adapater start</label>
                                 </div>
                             </div>

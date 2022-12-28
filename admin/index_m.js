@@ -1,13 +1,13 @@
 //Windhager-Adapter - Copyright (c) by Martin Danne
 
-const initStruct = {
+var reInit = {
     cmd:    'none',
     file:   null
 }
 
 function load(settings, onChange) {
     if (!settings) return;
-    $('.value').each(function () {
+    $('.config').each(function () {
         var $key = $(this);
         var id = $key.attr('id');
         if ($key.attr('type') === 'checkbox') {
@@ -32,13 +32,53 @@ function load(settings, onChange) {
             $('#fileInfo').html('');
     }
 
-    initStruct.cmd = settings.initStruct;
-    $(`input:radio[value=${initStruct.cmd}]`).prop('checked', true);
-    if(settings.importFile) {
-        initStruct.file = settings.importFile;
-        $('#fileImport').attr('disabled', null);
-    }
-    setFileInfo(initStruct.file);
+    socket.emit('getObject', `${adapter}.${instance}`, function (err, res) {
+        if(res && res.native && res.native.reInit) reInit = res.native.reInit;
+
+        $(`input:radio[value=${reInit.cmd}]`).prop('checked', true);
+        if(reInit.file) {
+            $('#fileImport').attr('disabled', null);
+        }
+        setFileInfo(reInit.file);
+
+        $('input[name=importStruct]').on('change', function () {
+            reInit.cmd = $('input[name=importStruct]:checked').val();
+            onChange();
+        });
+
+        $('#fullScan').prop('checked', reInit.fullScan);
+        $('#fullScan').on('change', function () {
+            reInit.fullScan = $('#fullScan').prop('checked');
+            onChange();
+        });
+        $('#deleteStruct').prop('checked', reInit.deleteStruct);
+        $('#deleteStruct').on('change', function () {
+            reInit.deleteStruct = $('#deleteStruct').prop('checked');
+            onChange();
+        });
+
+        $('#btnImport').on('click', function() {
+            var input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.setAttribute('id', 'files');
+            input.setAttribute('opacity', 0);
+            input.addEventListener('change', function (e) {
+                handleSelectImport(e, function (obj) {
+                    if(obj.model && obj.model === 'windhager.adapter.export') {
+                        reInit.cmd  = 'import';
+                        reInit.file = obj;
+                        $('#fileImport').attr('disabled', null)
+                                        .prop('checked', true);
+                        setFileInfo(obj);
+                        onChange();
+                    } else {
+                        $('#fileInfo').html('unknown File format');
+                    }
+                });
+            }, false);
+            (input.click)();
+        });
+    } );
 
     //import and export state model
     $('#btnExport').on('click', function() {
@@ -55,37 +95,6 @@ function load(settings, onChange) {
             }
         });
     });
-    $('input[name=importStruct]').on('change', function () {
-        initStruct.cmd = $('input[name=importStruct]:checked').val();
-        onChange();
-    });
-/*
-    $('#deleteStruct').on('change', function () {
-        settings.deleteStruct = $('#deleteStruct').prop('checked');
-        onChange();
-    });
- */
-    $('#btnImport').on('click', function() {
-        var input = document.createElement('input');
-        input.setAttribute('type', 'file');
-        input.setAttribute('id', 'files');
-        input.setAttribute('opacity', 0);
-        input.addEventListener('change', function (e) {
-            handleSelectImport(e, function (obj) {
-                if(obj.model && obj.model === 'windhager.adapter.export') {
-                    initStruct.cmd  = 'import';
-                    initStruct.file = obj;
-                    $('#fileImport').attr('disabled', null)
-                                    .prop('checked', true);
-                    setFileInfo(obj);
-                    onChange();
-                } else {
-                    $('#fileInfo').html('unknown File format');
-                }
-            });
-        }, false);
-        (input.click)();
-    });
 
     onChange(false);
     // reinitialize all the Materialize labels on the page if you are dynamically adding inputs:
@@ -96,7 +105,7 @@ function load(settings, onChange) {
 function save(callback) {
     // example: select elements with class=value and build settings object
     var obj = {};
-    $('.value').each(function () {
+    $('.config').each(function () {
         var $this = $(this);
         if ($this.attr('type') === 'checkbox') {
             obj[$this.attr('id')] = $this.prop('checked');
@@ -104,10 +113,10 @@ function save(callback) {
             obj[$this.attr('id')] = $this.val();
         }
     });
-    if( initStruct.cmd !== 'import') delete initStruct.file;
-    obj.initStruct = initStruct.cmd;
-    if(initStruct.file)
-        obj.importFile = initStruct.file;
+
+    if( reInit.cmd !== 'import') reInit.file = null;
+    socket.emit('extendObject', `${adapter}.${instance}`, { native: { reInit : reInit } });
+
     callback(obj);
 }
 

@@ -513,8 +513,6 @@ class Windhager extends utils.Adapter {
             this.setStateAsync('info.connection', { ack: true, val: true });
             this.log.info('Windhager connected');
 
-            this.parallel = 1;
-
             // are there knowDPs of previous scan
             var cfgObj = await this.getForeignObjectAsync( this.namespace );
             if( cfgObj && cfgObj.native && cfgObj.native.knownDPs ) {
@@ -523,8 +521,8 @@ class Windhager extends utils.Adapter {
             }
 
             this.status = 'initialize';
-            await this.windhager.init( this.config.fullScan );
-            if( this.config.fullScan ) {
+            await this.windhager.init( this.reInitConfig && this.reInitConfig.fullScan );
+            if( this.reInitConfig && this.reInitConfig.fullScan ) {
                 await this.extendForeignObjectAsync(this.namespace, {
                     native: {
                         knownDPs: this.windhager.knownDPs
@@ -536,14 +534,14 @@ class Windhager extends utils.Adapter {
             this.mapping = {};
 
             // initilize structure needed?
-            if ( this.config.initStruct && this.config.initStruct !== 'none') {
+            if ( this.reInitConfig && this.reInitConfig.cmd && this.reInitConfig.cmd !== 'none') {
                 this.log.debug('initialize state structure...');
-                if (this.config.initStruct === 'import')
-                    await this.importDeviceStructure(this.config.importFile, this.config.deleteStruct);
-                else if (this.config.initStruct === 'default')
-                    await this.importDeviceStructure(this.windhager.config['defaultStruct'], this.config.deleteStruct);
-                else if (this.config.initStruct === 'windhager')
-                    await this.createWindhagerDefaultStructure(this.config.deleteStruct);
+                if (this.reInitConfig.cmd === 'import')
+                    await this.importDeviceStructure(this.reInitConfig.file, this.reInitConfig.deleteStruct);
+                else if (this.reInitConfig.cmd === 'default')
+                    await this.importDeviceStructure(this.windhager.config['defaultStruct'], this.reInitConfig.deleteStruct);
+                else if (this.reInitConfig.cmd === 'windhager')
+                    await this.createWindhagerDefaultStructure(this.reInitConfig.deleteStruct);
             } else {
                 await this.readMapping();
             }
@@ -592,19 +590,21 @@ class Windhager extends utils.Adapter {
         this.status = 'start adapter';
 
         this.updateInterval = this.config.updateInterval * 1000;   // update interval
+
+        // is there any reInitializeConfig
+        const rootInst = await this.getForeignObjectAsync(this.namespace);
+        if(rootInst && rootInst.native && rootInst.native.reInit)
+            this.reInitConfig = rootInst.native.reInit;
+
         await this.startWindhager();
 
-        this.log.debug('back to on ready');
+        // delete reInitializeConfig if exists
+        if(this.reInitConfig)
+            await this.extendForeignObjectAsync(this.namespace, { native: {reInit: null}});
+
         this.subscribeStates('*');
         this.subscribeObjects('*');
 
-        // reset init config after restart
-        await this.updateConfig( {
-                fullScan:       false,
-                deleteStruct:   false,
-                initStruct:     'none',
-                importFile:     null
-            } );
         this.log.debug('onReady end');
     }
 
